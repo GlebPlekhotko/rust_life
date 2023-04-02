@@ -212,6 +212,101 @@ impl Field {
         }
     }
     
+    // Process cells which belong to the "out of population" area.
+    fn off_fence_alive(&self, mut x : i32, mut y : i32) -> bool {
+        let x_max = self.population.len() as i32;
+        let y_max = self.population[0].len() as i32;
+        let mut alive = false;
+        
+        if let FieldFenceType::FieldFenceTypeCliff = self.fence_type {
+            return false;
+        }
+        
+        /* If "y" coordinate is negative, then we address the cell in the "top" fence area which possesses the
+           following layout:
+           
+           O-----------------------------------------------> x'
+           |                 Top Off Fence
+           | <- (x'-x)/2 -> .             .  <- (x'-x)/2 -> 
+           |                .             .
+           V ---------------O-------------> x
+           y'               |
+                            | Population
+                            | 
+                            V
+                            y
+           
+           So to translate the negative "y" coordinate, we must add the "height" off the "off-fence" area. The "x"
+           coordinate (which might be both negative and positive) we must add half of the "off-fence" width minus
+           the width of the "population" area. */
+        if y < 0 {
+            y = y + self.fence.as_ref().unwrap().top_population[0].len() as i32;
+            x = x + (self.fence.as_ref().unwrap().left_population.len() as i32 - self.population.len() as i32 / 2);
+        }
+        
+        /* If "y" coordinate is greater, than "height" of the population area, then we should address the "bottom"
+           off fence area:
+           
+                            O-------------> x
+                            |
+                            | Population
+                            | 
+           O----------------V------------------------------> x'
+           |                .             .
+           | <- (x'-x)/2 -> .             .  <- (x'-x)/2 -> 
+           |                .             .
+           V               Bottom Off Fence
+           y'
+           
+           The "y" coordinate is obtained by subtracting the "height" of the population area and adding height of the
+           off-fence area. Translation of the "x" coordinate is the same as for the previous case. */
+        if y > y_max {
+            y = y - y_max + self.fence.as_ref().unwrap().top_population[0].len() as i32;
+            x = x + (self.fence.as_ref().unwrap().left_population.len() as i32 - self.population.len() as i32 / 2);
+        }
+        
+        /* Negative "x" coordinate addresses the left "off-fence" area:
+        
+                           x'
+           O--------------->O-------------> x
+           |                |
+           | Left Off Fence | Population
+           |                | 
+           V                V
+           y'               y
+           
+           The "y" coordinate does not need translation in this case, while for the "x" it's enough to add the width of
+           the "off-fence" area. */
+        if x < 0 {
+            x = x + self.fence.as_ref().unwrap().left_population.len() as i32;
+        }
+        
+        /* The "x" greater than width of the "population" area addresses the right "off-fence" area:
+        
+                           x'
+           O------------->O---------------> x
+           |              |                
+           | Population   | Right Off Fence 
+           |              |                
+           V              V
+           y'             y
+           
+           The "y" coordinate remains the same. The "x" coordinate must be subtracted width of the "population" 
+           area. */
+        if x > x_max {
+            x = x - x_max - self.fence.as_ref().unwrap().right_population.len() as i32;
+        }
+        
+        match self.fence_type {
+            FieldFenceType::FieldFenceTypeCliff => 
+                alive = false,
+            _ => 
+                alive = false
+        }
+        
+        return alive;
+    }
+    
     fn count_neighbours(&self, x : i32, y : i32) -> u32 {
         let x_width = self.population.len() as i32;
         let y_width = self.population[0].len() as i32;
@@ -220,31 +315,15 @@ impl Field {
         for x_neighbour in x - 1 ..= x + 1 {
             for y_neighbour in y - 1 ..= y + 1 {
                 
-                if x_neighbour == -1 {
-                    match self.fence_type {
-                        FieldFenceType::FieldFenceTypeCliff => continue,
-                        FieldFenceType::FieldFenceTypeFadeAway => continue
-                    }
-                }
-                
-                if x_neighbour == x_width {
-                    match self.fence_type {
-                        FieldFenceType::FieldFenceTypeCliff => continue,
-                        FieldFenceType::FieldFenceTypeFadeAway => continue
+                if (x_neighbour == -1) || (x_neighbour == x_width) {
+                    if self.off_fence_alive(x, y) == true {
+                        neighbours += 1;
                     }
                 }
 
-                if y_neighbour == -1 {
-                    match self.fence_type {
-                        FieldFenceType::FieldFenceTypeCliff => continue,
-                        FieldFenceType::FieldFenceTypeFadeAway => continue
-                    }
-                }
-                
-                if y_neighbour == y_width  {
-                    match self.fence_type {
-                        FieldFenceType::FieldFenceTypeCliff => continue,
-                        FieldFenceType::FieldFenceTypeFadeAway => continue
+                if (y_neighbour == -1) || (y_neighbour == y_width) {
+                    if self.off_fence_alive(x, y) == true {
+                        neighbours += 1;
                     }
                 }
                 
