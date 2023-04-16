@@ -1,13 +1,20 @@
-pub enum FieldFenceType {
-    FieldFenceTypeCliff,
-    FieldFenceTypeFadeAway
+pub enum FenceType {
+    Cliff,
+    FadeAway
+}
+
+enum FenceSide {
+    Top, 
+    Bottom, 
+    Left,
+    Right,
+    Inside
 }
 
 struct Cell {
     kill : bool,
     hatch : bool
 }
-
 
 struct Fence {
     top_population : Vec<Vec<bool>>,
@@ -20,14 +27,14 @@ struct Fence {
     left_cell : Vec<Vec<Cell>>,
     
     right_population : Vec<Vec<bool>>,
-    right_cell : Vec<Vec<Cell>>,
+    right_cell : Vec<Vec<Cell>>
 }
 
 pub struct Field {
     pub population : Vec<Vec<bool>>,
     
     fence : Option<Fence>,
-    fence_type : FieldFenceType,
+    fence_type : FenceType,
 
     cell : Vec<Vec<Cell>>,
     
@@ -82,7 +89,7 @@ pub fn equal(first : &Field, second : &Field) -> bool {
 }
 
 impl Field {
-    pub fn create(x_size : u32, y_size : u32, fence : FieldFenceType) -> Self {
+    pub fn create(x_size : u32, y_size : u32, fence : FenceType) -> Self {
         if x_size == 0 || y_size == 0 {
             panic!("Field cannot be zero in size!");
         }
@@ -135,7 +142,7 @@ impl Field {
              | |
              |3| */
         
-        if let FieldFenceType::FieldFenceTypeFadeAway = new_field.fence_type {
+        if let FenceType::FadeAway = new_field.fence_type {
             let largest_pattern = 3;
             
             new_field.fence = Some( 
@@ -212,96 +219,108 @@ impl Field {
         }
     }
     
+    fn off_fence_coordinates(&self, mut x : i32, mut y : i32) -> (FenceSide, i32, i32) {
+        let x_max = self.population.len() as i32;
+        let y_max = self.population[0].len() as i32;
+        let mut side : FenceSide = FenceSide::Inside;
+        
+        loop {
+            /* If "y" coordinate is negative, then we address the cell in the "top" fence area which possesses the
+               following layout:
+               
+               O-----------------------------------------------> x'
+               |                 Top Off Fence
+               | <- (x'-x)/2 -> .             .  <- (x'-x)/2 -> 
+               |                .             .
+               V ---------------O-------------> x
+               y'               |
+                                | Population
+                                | 
+                                V
+                                y
+               
+               So to translate the negative "y" coordinate, we must add the "height" off the "off-fence" area. The "x"
+               coordinate (which might be both negative and positive) we must add half of the "off-fence" width minus
+               the width of the "population" area. */
+            if y < 0 {
+                y = y + self.fence.as_ref().unwrap().top_population[0].len() as i32;
+                x = x + self.fence.as_ref().unwrap().left_population.len() as i32;
+                side = FenceSide::Top;
+                break;
+            }
+            
+            /* If "y" coordinate is greater, than "height" of the population area, then we should address the "bottom"
+               off fence area:
+               
+                                O-------------> x
+                                |
+                                | Population
+                                | 
+               O----------------V------------------------------> x'
+               |                .             .
+               | <- (x'-x)/2 -> .             .  <- (x'-x)/2 -> 
+               |                .             .
+               V               Bottom Off Fence
+               y'
+               
+               The "y" coordinate is obtained by subtracting the "height" of the population area and adding height of the
+               off-fence area. Translation of the "x" coordinate is the same as for the previous case. */
+            if y >= y_max {
+                y = y - y_max;
+                x = x + self.fence.as_ref().unwrap().left_population.len() as i32;
+                side = FenceSide::Bottom;
+                break;
+            }
+            
+            /* Negative "x" coordinate addresses the left "off-fence" area:
+            
+                               x'
+               O--------------->O-------------> x
+               |                |
+               | Left Off Fence | Population
+               |                | 
+               V                V
+               y'               y
+               
+               The "y" coordinate does not need translation in this case, while for the "x" it's enough to add the width of
+               the "off-fence" area. */
+            if x < 0 {
+                x = x + self.fence.as_ref().unwrap().left_population.len() as i32;
+                side = FenceSide::Left;
+                break;
+            }
+            
+            /* The "x" greater than width of the "population" area addresses the right "off-fence" area:
+            
+                               x'
+               O------------->O---------------> x
+               |              |                
+               | Population   | Right Off Fence 
+               |              |                
+               V              V
+               y'             y
+               
+               The "y" coordinate remains the same. The "x" coordinate must be subtracted width of the "population" 
+               area. */
+            if x >= x_max {
+                x = x - x_max;
+                side = FenceSide::Right;
+                break;
+            }
+            break;
+        }
+        
+        (side, x, y)
+    }
+    
     // Process cells which belong to the "out of population" area.
-    fn off_fence_alive(&self, mut x : i32, mut y : i32) -> bool {
+    fn off_fence_alive(&self, x : i32, y : i32) -> bool {
         let x_max = self.population.len() as i32;
         let y_max = self.population[0].len() as i32;
         let mut alive = false;
         
-        if let FieldFenceType::FieldFenceTypeCliff = self.fence_type {
+        if let FenceType::Cliff = self.fence_type {
             return false;
-        }
-        
-        /* If "y" coordinate is negative, then we address the cell in the "top" fence area which possesses the
-           following layout:
-           
-           O-----------------------------------------------> x'
-           |                 Top Off Fence
-           | <- (x'-x)/2 -> .             .  <- (x'-x)/2 -> 
-           |                .             .
-           V ---------------O-------------> x
-           y'               |
-                            | Population
-                            | 
-                            V
-                            y
-           
-           So to translate the negative "y" coordinate, we must add the "height" off the "off-fence" area. The "x"
-           coordinate (which might be both negative and positive) we must add half of the "off-fence" width minus
-           the width of the "population" area. */
-        if y < 0 {
-            y = y + self.fence.as_ref().unwrap().top_population[0].len() as i32;
-            x = x + (self.fence.as_ref().unwrap().left_population.len() as i32 - self.population.len() as i32 / 2);
-        }
-        
-        /* If "y" coordinate is greater, than "height" of the population area, then we should address the "bottom"
-           off fence area:
-           
-                            O-------------> x
-                            |
-                            | Population
-                            | 
-           O----------------V------------------------------> x'
-           |                .             .
-           | <- (x'-x)/2 -> .             .  <- (x'-x)/2 -> 
-           |                .             .
-           V               Bottom Off Fence
-           y'
-           
-           The "y" coordinate is obtained by subtracting the "height" of the population area and adding height of the
-           off-fence area. Translation of the "x" coordinate is the same as for the previous case. */
-        if y > y_max {
-            y = y - y_max + self.fence.as_ref().unwrap().top_population[0].len() as i32;
-            x = x + (self.fence.as_ref().unwrap().left_population.len() as i32 - self.population.len() as i32 / 2);
-        }
-        
-        /* Negative "x" coordinate addresses the left "off-fence" area:
-        
-                           x'
-           O--------------->O-------------> x
-           |                |
-           | Left Off Fence | Population
-           |                | 
-           V                V
-           y'               y
-           
-           The "y" coordinate does not need translation in this case, while for the "x" it's enough to add the width of
-           the "off-fence" area. */
-        if x < 0 {
-            x = x + self.fence.as_ref().unwrap().left_population.len() as i32;
-        }
-        
-        /* The "x" greater than width of the "population" area addresses the right "off-fence" area:
-        
-                           x'
-           O------------->O---------------> x
-           |              |                
-           | Population   | Right Off Fence 
-           |              |                
-           V              V
-           y'             y
-           
-           The "y" coordinate remains the same. The "x" coordinate must be subtracted width of the "population" 
-           area. */
-        if x > x_max {
-            x = x - x_max - self.fence.as_ref().unwrap().right_population.len() as i32;
-        }
-        
-        match self.fence_type {
-            FieldFenceType::FieldFenceTypeCliff => 
-                alive = false,
-            _ => 
-                alive = false
         }
         
         return alive;
@@ -382,5 +401,120 @@ impl Field {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn off_fence_inside_zero_zero() {
+        let test_field = Field::create(10, 20, FenceType::FadeAway);
+        
+        let (side, x, y) = test_field.off_fence_coordinates(0, 0);
+        
+        assert!(if let FenceSide::Inside = side { true } else { false });
+        assert_eq!(0, x);
+        assert_eq!(0, y);
+    }
+    
+    #[test]
+    fn off_fence_inside_max_max() {
+        let test_field = Field::create(10, 20, FenceType::FadeAway);
+        
+        let (side, x, y) = test_field.off_fence_coordinates(9, 19);
+        
+        assert!(if let FenceSide::Inside = side { true } else { false });
+        assert_eq!(9, x);
+        assert_eq!(19, y);
+    }
+    
+    #[test]
+    fn off_fence_top_zero_zero() {
+        let test_field = Field::create(10, 20, FenceType::FadeAway);
+        
+        let (side, x, y) = test_field.off_fence_coordinates(-3, -3);
+        
+        assert!(if let FenceSide::Top = side { true } else { false });
+        assert_eq!(0, x);
+        assert_eq!(0, y);
+    }
+    
+    #[test]
+    fn off_fence_top_max_max() {
+        let test_field = Field::create(10, 20, FenceType::FadeAway);
+        
+        let (side, x, y) = test_field.off_fence_coordinates(12, -1);
+        
+        assert!(if let FenceSide::Top = side { true } else { false });
+        assert_eq!(15, x);
+        assert_eq!(2, y);
+    }
+    
+    #[test]
+    fn off_fence_bottom_zero_zero() {
+        let test_field = Field::create(10, 20, FenceType::FadeAway);
+        
+        let (side, x, y) = test_field.off_fence_coordinates(-3, 20);
+        
+        assert!(if let FenceSide::Bottom = side { true } else { false });
+        assert_eq!(0, x);
+        assert_eq!(0, y);
+    }
+    
+    #[test]
+    fn off_fence_bottom_max_max() {
+        let test_field = Field::create(10, 20, FenceType::FadeAway);
+        
+        let (side, x, y) = test_field.off_fence_coordinates(12, 22);
+        
+        assert!(if let FenceSide::Bottom = side { true } else { false });
+        assert_eq!(15, x);
+        assert_eq!(2, y);
+    }
+    
+    #[test]
+    fn off_fence_left_zero_zero() {
+        let test_field = Field::create(10, 20, FenceType::FadeAway);
+        
+        let (side, x, y) = test_field.off_fence_coordinates(-3, 0);
+        
+        assert!(if let FenceSide::Left = side { true } else { false });
+        assert_eq!(0, x);
+        assert_eq!(0, y);
+    }
+    
+    #[test]
+    fn off_fence_left_max_max() {
+        let test_field = Field::create(10, 20, FenceType::FadeAway);
+        
+        let (side, x, y) = test_field.off_fence_coordinates(-1, 19);
+        
+        assert!(if let FenceSide::Left = side { true } else { false });
+        assert_eq!(2, x);
+        assert_eq!(19, y);
+    }
+    
+    #[test]
+    fn off_fence_right_zero_zero() {
+        let test_field = Field::create(10, 20, FenceType::FadeAway);
+        
+        let (side, x, y) = test_field.off_fence_coordinates(10, 0);
+        
+        assert!(if let FenceSide::Right = side { true } else { false });
+        assert_eq!(0, x);
+        assert_eq!(0, y);
+    }
+    
+    #[test]
+    fn off_fence_right_max_max() {
+        let test_field = Field::create(10, 20, FenceType::FadeAway);
+        
+        let (side, x, y) = test_field.off_fence_coordinates(12, 19);
+        
+        assert!(if let FenceSide::Right = side { true } else { false });
+        assert_eq!(2, x);
+        assert_eq!(19, y);
     }
 }

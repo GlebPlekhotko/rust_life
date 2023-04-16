@@ -2,10 +2,10 @@ mod display;
 //mod field;
 
 use life::field;
-use life::field::FieldFenceType::*;
+use life::field::FenceType::*;
 
 fn main() {
-    let new_field = field::Field::create(10,10, FieldFenceTypeCliff);
+    let new_field = field::Field::create(10,10, Cliff);
     println!("{}", new_field.population.len());
     
     let test : &bool = &new_field.population[0][0];
