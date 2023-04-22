@@ -3,12 +3,12 @@ pub enum FenceType {
     FadeAway
 }
 
-enum FenceSide {
+enum FieldSide {
+    Inside,
     Top, 
     Bottom, 
     Left,
-    Right,
-    Inside
+    Right
 }
 
 struct Cell {
@@ -200,6 +200,30 @@ impl Field {
         new_field
     }
     
+    fn get_cell(&mut self, x : i32, y : i32) -> &mut Cell {
+        let (side, x, y) = self.translate_coordinates(x, y);
+        
+        match side {
+            FieldSide::Inside => &mut self.cell[x][y],
+            FieldSide::Top    => &mut self.fence.as_mut().unwrap().top_cell[x][y],
+            FieldSide::Bottom => &mut self.fence.as_mut().unwrap().bottom_cell[x][y],
+            FieldSide::Left   => &mut self.fence.as_mut().unwrap().left_cell[x][y],
+            FieldSide::Right  => &mut self.fence.as_mut().unwrap().right_cell[x][y]
+        }
+    }
+    
+    fn get_population(&mut self, x : i32, y : i32) -> &mut bool {
+        let (side, x, y) = self.translate_coordinates(x, y);
+        
+        match side {
+            FieldSide::Inside => &mut self.population[x][y],
+            FieldSide::Top    => &mut self.fence.as_mut().unwrap().top_population[x][y],
+            FieldSide::Bottom => &mut self.fence.as_mut().unwrap().bottom_population[x][y],
+            FieldSide::Left   => &mut self.fence.as_mut().unwrap().left_population[x][y],
+            FieldSide::Right  => &mut self.fence.as_mut().unwrap().right_population[x][y]
+        }
+    }
+    
     pub fn populate_randomly(&mut self, density : f32) {
         if (density == 0.0) || (density >= 1.0) {
             panic!("Population density must be above 0 and below 1.0");
@@ -219,10 +243,10 @@ impl Field {
         }
     }
     
-    fn off_fence_coordinates(&self, mut x : i32, mut y : i32) -> (FenceSide, i32, i32) {
+    fn translate_coordinates(&self, mut x : i32, mut y : i32) -> (FieldSide, usize, usize) {
         let x_max = self.population.len() as i32;
         let y_max = self.population[0].len() as i32;
-        let mut side : FenceSide = FenceSide::Inside;
+        let mut side : FieldSide = FieldSide::Inside;
         
         loop {
             /* If "y" coordinate is negative, then we address the cell in the "top" fence area which possesses the
@@ -245,7 +269,7 @@ impl Field {
             if y < 0 {
                 y = y + self.fence.as_ref().unwrap().top_population[0].len() as i32;
                 x = x + self.fence.as_ref().unwrap().left_population.len() as i32;
-                side = FenceSide::Top;
+                side = FieldSide::Top;
                 break;
             }
             
@@ -268,7 +292,7 @@ impl Field {
             if y >= y_max {
                 y = y - y_max;
                 x = x + self.fence.as_ref().unwrap().left_population.len() as i32;
-                side = FenceSide::Bottom;
+                side = FieldSide::Bottom;
                 break;
             }
             
@@ -286,7 +310,7 @@ impl Field {
                the "off-fence" area. */
             if x < 0 {
                 x = x + self.fence.as_ref().unwrap().left_population.len() as i32;
-                side = FenceSide::Left;
+                side = FieldSide::Left;
                 break;
             }
             
@@ -304,17 +328,21 @@ impl Field {
                area. */
             if x >= x_max {
                 x = x - x_max;
-                side = FenceSide::Right;
+                side = FieldSide::Right;
                 break;
             }
             break;
         }
         
-        (side, x, y)
+        if x < 0 || y < 0 {
+            panic!("Negative coordinates detected");
+        }
+        
+        (side, x as usize, y as usize)
     }
     
     // Process cells which belong to the "out of population" area.
-    fn off_fence_alive(&self, x : i32, y : i32) -> bool {
+    fn is_alive(&self, x : i32, y : i32) -> bool {
         let x_max = self.population.len() as i32;
         let y_max = self.population[0].len() as i32;
         let mut alive = false;
@@ -335,13 +363,13 @@ impl Field {
             for y_neighbour in y - 1 ..= y + 1 {
                 
                 if (x_neighbour == -1) || (x_neighbour == x_width) {
-                    if self.off_fence_alive(x, y) == true {
+                    if self.is_alive(x, y) == true {
                         neighbours += 1;
                     }
                 }
 
                 if (y_neighbour == -1) || (y_neighbour == y_width) {
-                    if self.off_fence_alive(x, y) == true {
+                    if self.is_alive(x, y) == true {
                         neighbours += 1;
                     }
                 }
@@ -409,111 +437,111 @@ mod tests {
     use super::*;
     
     #[test]
-    fn off_fence_inside_zero_zero() {
+    fn translate_coordinates_inside_zero_zero() {
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
-        let (side, x, y) = test_field.off_fence_coordinates(0, 0);
+        let (side, x, y) = test_field.translate_coordinates(0, 0);
         
-        assert!(if let FenceSide::Inside = side { true } else { false });
+        assert!(if let FieldSide::Inside = side { true } else { false });
         assert_eq!(0, x);
         assert_eq!(0, y);
     }
     
     #[test]
-    fn off_fence_inside_max_max() {
+    fn translate_coordinates_inside_max_max() {
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
-        let (side, x, y) = test_field.off_fence_coordinates(9, 19);
+        let (side, x, y) = test_field.translate_coordinates(9, 19);
         
-        assert!(if let FenceSide::Inside = side { true } else { false });
+        assert!(if let FieldSide::Inside = side { true } else { false });
         assert_eq!(9, x);
         assert_eq!(19, y);
     }
     
     #[test]
-    fn off_fence_top_zero_zero() {
+    fn translate_coordinates_top_zero_zero() {
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
-        let (side, x, y) = test_field.off_fence_coordinates(-3, -3);
+        let (side, x, y) = test_field.translate_coordinates(-3, -3);
         
-        assert!(if let FenceSide::Top = side { true } else { false });
+        assert!(if let FieldSide::Top = side { true } else { false });
         assert_eq!(0, x);
         assert_eq!(0, y);
     }
     
     #[test]
-    fn off_fence_top_max_max() {
+    fn translate_coordinates_top_max_max() {
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
-        let (side, x, y) = test_field.off_fence_coordinates(12, -1);
+        let (side, x, y) = test_field.translate_coordinates(12, -1);
         
-        assert!(if let FenceSide::Top = side { true } else { false });
+        assert!(if let FieldSide::Top = side { true } else { false });
         assert_eq!(15, x);
         assert_eq!(2, y);
     }
     
     #[test]
-    fn off_fence_bottom_zero_zero() {
+    fn translate_coordinates_bottom_zero_zero() {
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
-        let (side, x, y) = test_field.off_fence_coordinates(-3, 20);
+        let (side, x, y) = test_field.translate_coordinates(-3, 20);
         
-        assert!(if let FenceSide::Bottom = side { true } else { false });
+        assert!(if let FieldSide::Bottom = side { true } else { false });
         assert_eq!(0, x);
         assert_eq!(0, y);
     }
     
     #[test]
-    fn off_fence_bottom_max_max() {
+    fn translate_coordinates_bottom_max_max() {
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
-        let (side, x, y) = test_field.off_fence_coordinates(12, 22);
+        let (side, x, y) = test_field.translate_coordinates(12, 22);
         
-        assert!(if let FenceSide::Bottom = side { true } else { false });
+        assert!(if let FieldSide::Bottom = side { true } else { false });
         assert_eq!(15, x);
         assert_eq!(2, y);
     }
     
     #[test]
-    fn off_fence_left_zero_zero() {
+    fn translate_coordinates_left_zero_zero() {
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
-        let (side, x, y) = test_field.off_fence_coordinates(-3, 0);
+        let (side, x, y) = test_field.translate_coordinates(-3, 0);
         
-        assert!(if let FenceSide::Left = side { true } else { false });
+        assert!(if let FieldSide::Left = side { true } else { false });
         assert_eq!(0, x);
         assert_eq!(0, y);
     }
     
     #[test]
-    fn off_fence_left_max_max() {
+    fn translate_coordinates_left_max_max() {
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
-        let (side, x, y) = test_field.off_fence_coordinates(-1, 19);
+        let (side, x, y) = test_field.translate_coordinates(-1, 19);
         
-        assert!(if let FenceSide::Left = side { true } else { false });
+        assert!(if let FieldSide::Left = side { true } else { false });
         assert_eq!(2, x);
         assert_eq!(19, y);
     }
     
     #[test]
-    fn off_fence_right_zero_zero() {
+    fn translate_coordinates_right_zero_zero() {
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
-        let (side, x, y) = test_field.off_fence_coordinates(10, 0);
+        let (side, x, y) = test_field.translate_coordinates(10, 0);
         
-        assert!(if let FenceSide::Right = side { true } else { false });
+        assert!(if let FieldSide::Right = side { true } else { false });
         assert_eq!(0, x);
         assert_eq!(0, y);
     }
     
     #[test]
-    fn off_fence_right_max_max() {
+    fn translate_coordinates_right_max_max() {
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
-        let (side, x, y) = test_field.off_fence_coordinates(12, 19);
+        let (side, x, y) = test_field.translate_coordinates(12, 19);
         
-        assert!(if let FenceSide::Right = side { true } else { false });
+        assert!(if let FieldSide::Right = side { true } else { false });
         assert_eq!(2, x);
         assert_eq!(19, y);
     }
