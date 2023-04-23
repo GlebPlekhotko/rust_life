@@ -200,7 +200,7 @@ impl Field {
         new_field
     }
     
-    fn get_cell(&mut self, x : i32, y : i32) -> &mut Cell {
+    fn cell(&mut self, x : i32, y : i32) -> &mut Cell {
         let (side, x, y) = self.translate_coordinates(x, y);
         
         match side {
@@ -212,7 +212,7 @@ impl Field {
         }
     }
     
-    fn get_population(&mut self, x : i32, y : i32) -> &mut bool {
+    fn inhabitant(&mut self, x : i32, y : i32) -> &mut bool {
         let (side, x, y) = self.translate_coordinates(x, y);
         
         match side {
@@ -341,35 +341,27 @@ impl Field {
         (side, x as usize, y as usize)
     }
     
-    // Process cells which belong to the "out of population" area.
-    fn is_alive(&self, x : i32, y : i32) -> bool {
-        let x_max = self.population.len() as i32;
-        let y_max = self.population[0].len() as i32;
-        let mut alive = false;
-        
-        if let FenceType::Cliff = self.fence_type {
-            return false;
-        }
-        
-        return alive;
+    fn alive(&mut self, x : i32, y : i32) -> bool {
+        return *self.inhabitant(x, y);
     }
     
-    fn count_neighbours(&self, x : i32, y : i32) -> u32 {
+    fn neighbours(&mut self, x : i32, y : i32) -> u32 {
         let x_width = self.population.len() as i32;
         let y_width = self.population[0].len() as i32;
         let mut neighbours = 0;
         
         for x_neighbour in x - 1 ..= x + 1 {
             for y_neighbour in y - 1 ..= y + 1 {
+                let cell_alive = self.inhabitant(x, y);
                 
                 if (x_neighbour == -1) || (x_neighbour == x_width) {
-                    if self.is_alive(x, y) == true {
+                    if *cell_alive == true {
                         neighbours += 1;
                     }
                 }
 
                 if (y_neighbour == -1) || (y_neighbour == y_width) {
-                    if self.is_alive(x, y) == true {
+                    if *cell_alive == true {
                         neighbours += 1;
                     }
                 }
@@ -388,25 +380,38 @@ impl Field {
     }
     
     pub fn update(&mut self, cycles : u32) {
-        let x_width = self.population.len() as i32;
-        let y_width = self.population[0].len() as i32;
+        let mut x_start = 0 as i32;
+        let mut x_end = self.population.len() as i32;
+        let mut y_start = 0 as i32;
+        let mut y_end = self.population[0].len() as i32;
+        
+        if let FenceType::FadeAway = self.fence_type {
+            x_start = x_start - self.fence.as_ref().unwrap().left_population.len() as i32;
+            x_end = x_end + self.fence.as_ref().unwrap().right_population.len() as i32;
+            
+            y_start = y_start - self.fence.as_ref().unwrap().top_population[0].len() as i32;
+            y_end = y_end + self.fence.as_ref().unwrap().bottom_population[0].len() as i32;
+        }
+        
+        let mut x_width = self.population.len() as i32;
+        let mut y_width = self.population[0].len() as i32;
 
         for _cycle in 0..cycles {
             for x in 0..x_width {
                 for y in 0..y_width {
                     let mut cell_neighbours : u32 = 0;
                     
-                    cell_neighbours = self.count_neighbours(x, y);
+                    cell_neighbours = self.neighbours(x, y);
                     
-                    if self.population[x as usize][y as usize] == true {
+                    if self.alive(x, y) == true {
                         if cell_neighbours < 2 || cell_neighbours > 3 {
-                            self.cell[x as usize][y as usize].kill = true;
-                            self.cell[x as usize][y as usize].hatch = false;
+                            self.cell(x, y).kill = true;
+                            self.cell(x, y).hatch = false;
                         }
                     } else {
                         if cell_neighbours == 3 {
-                            self.cell[x as usize][y as usize].kill = true;
-                            self.cell[x as usize][y as usize].hatch = true;
+                            self.cell(x, y).kill = true;
+                            self.cell(x, y).hatch = true;
                         }
                     }
                 }
@@ -414,18 +419,18 @@ impl Field {
             
             for x in 0..x_width {
                 for y in 0..y_width {
-                    if self.population[x as usize][y as usize] == true {
-                        if self.cell[x as usize][y as usize].kill == true {
-                            self.population[x as usize][y as usize] = false;
+                    if self.alive(x, y) == true {
+                        if self.cell(x, y).kill == true {
+                            *(self.inhabitant(x, y)) = false;
                         }
                     } else {
-                        if self.cell[x as usize][y as usize].hatch == true {
-                            self.population[x as usize][y as usize] = true;
+                        if self.cell(x, y).hatch == true {
+                            *(self.inhabitant(x, y)) = true;
                         }
-                    }
+                    }                   
                     
-                    self.cell[x as usize][y as usize].kill = false;
-                    self.cell[x as usize][y as usize].hatch = false;
+                    self.cell(x, y).kill = false;
+                    self.cell(x, y).hatch = false;
                 }
             }
         }
