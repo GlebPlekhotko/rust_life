@@ -352,16 +352,14 @@ impl Field {
         
         for x_neighbour in x - 1 ..= x + 1 {
             for y_neighbour in y - 1 ..= y + 1 {
-                let cell_alive = self.inhabitant(x, y);
-                
                 if (x_neighbour == -1) || (x_neighbour == x_width) {
-                    if *cell_alive == true {
+                    if self.alive(x, y) == true {
                         neighbours += 1;
                     }
                 }
 
                 if (y_neighbour == -1) || (y_neighbour == y_width) {
-                    if *cell_alive == true {
+                    if self.alive(x, y) == true {
                         neighbours += 1;
                     }
                 }
@@ -392,16 +390,11 @@ impl Field {
             y_start = y_start - self.fence.as_ref().unwrap().top_population[0].len() as i32;
             y_end = y_end + self.fence.as_ref().unwrap().bottom_population[0].len() as i32;
         }
-        
-        let mut x_width = self.population.len() as i32;
-        let mut y_width = self.population[0].len() as i32;
 
         for _cycle in 0..cycles {
-            for x in 0..x_width {
-                for y in 0..y_width {
-                    let mut cell_neighbours : u32 = 0;
-                    
-                    cell_neighbours = self.neighbours(x, y);
+            for x in x_start..x_end {
+                for y in y_start..y_end {
+                    let cell_neighbours = self.neighbours(x, y);
                     
                     if self.alive(x, y) == true {
                         if cell_neighbours < 2 || cell_neighbours > 3 {
@@ -417,8 +410,8 @@ impl Field {
                 }
             }
             
-            for x in 0..x_width {
-                for y in 0..y_width {
+            for x in x_start..x_end {
+                for y in y_start..y_end {
                     if self.alive(x, y) == true {
                         if self.cell(x, y).kill == true {
                             *(self.inhabitant(x, y)) = false;
