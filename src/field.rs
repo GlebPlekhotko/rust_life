@@ -5,10 +5,11 @@ pub enum FenceType {
 
 enum FieldSide {
     Inside,
+    Outside,
     Top, 
     Bottom, 
     Left,
-    Right
+    Right,
 }
 
 struct Cell {
@@ -208,11 +209,13 @@ impl Field {
             FieldSide::Top    => &mut self.fence.as_mut().unwrap().top_cell[x][y],
             FieldSide::Bottom => &mut self.fence.as_mut().unwrap().bottom_cell[x][y],
             FieldSide::Left   => &mut self.fence.as_mut().unwrap().left_cell[x][y],
-            FieldSide::Right  => &mut self.fence.as_mut().unwrap().right_cell[x][y]
+            FieldSide::Right  => &mut self.fence.as_mut().unwrap().right_cell[x][y],
+            FieldSide::Outside => panic!("Non-existing cell referenced")
         }
     }
     
     fn inhabitant(&mut self, x : i32, y : i32) -> &mut bool {
+        let (x_copy, y_copy) = (x, y);
         let (side, x, y) = self.translate_coordinates(x, y);
         
         match side {
@@ -220,7 +223,8 @@ impl Field {
             FieldSide::Top    => &mut self.fence.as_mut().unwrap().top_population[x][y],
             FieldSide::Bottom => &mut self.fence.as_mut().unwrap().bottom_population[x][y],
             FieldSide::Left   => &mut self.fence.as_mut().unwrap().left_population[x][y],
-            FieldSide::Right  => &mut self.fence.as_mut().unwrap().right_population[x][y]
+            FieldSide::Right  => &mut self.fence.as_mut().unwrap().right_population[x][y],
+            FieldSide::Outside => panic!("Non-existing inhabitant referenced {} {}", x_copy, y_copy)
         }
     }
     
@@ -249,6 +253,30 @@ impl Field {
         let mut side : FieldSide = FieldSide::Inside;
         
         loop {
+             if let FenceType::Cliff = self.fence_type {
+                 if x < 0 {
+                     x = 0;
+                     side = FieldSide::Outside;
+                 }
+                 
+                 if x >= x_max {
+                     x = x_max - 1;
+                     side = FieldSide::Outside;
+                 }
+                 
+                 if y < 0 {
+                     y = 0;
+                     side = FieldSide::Outside;
+                 }
+                 
+                 if y >= y_max {
+                     y = y_max - 1;
+                     side = FieldSide::Outside;
+                 }
+                 
+                 break;
+             }
+            
             /* If "y" coordinate is negative, then we address the cell in the "top" fence area which possesses the
                following layout:
                
@@ -335,7 +363,7 @@ impl Field {
         }
         
         if x < 0 || y < 0 {
-            panic!("Negative coordinates detected");
+            side = FieldSide::Outside;
         }
         
         (side, x as usize, y as usize)
@@ -352,23 +380,17 @@ impl Field {
         
         for x_neighbour in x - 1 ..= x + 1 {
             for y_neighbour in y - 1 ..= y + 1 {
-                if (x_neighbour == -1) || (x_neighbour == x_width) {
-                    if self.alive(x, y) == true {
-                        neighbours += 1;
-                    }
-                }
-
-                if (y_neighbour == -1) || (y_neighbour == y_width) {
-                    if self.alive(x, y) == true {
-                        neighbours += 1;
-                    }
+                let (neighbour_side, _, _) = self.translate_coordinates(x_neighbour, y_neighbour);
+                
+                if let FieldSide::Outside = neighbour_side {
+                    continue;
                 }
                 
                 if x_neighbour == x && y_neighbour == y {
-                    continue
+                    continue;
                 }
-
-                if self.population[x_neighbour as usize][y_neighbour as usize] == true {
+                
+                if self.alive(x_neighbour, y_neighbour) == true {
                     neighbours += 1;
                 }
             }
@@ -541,6 +563,72 @@ mod tests {
         
         assert!(if let FieldSide::Right = side { true } else { false });
         assert_eq!(2, x);
+        assert_eq!(19, y);
+    }
+    
+    #[test]
+    fn translate_coordinates_cliff_negative_x() {
+        let test_field = Field::create(10, 20, FenceType::Cliff);
+        
+        let (side, x, y) = test_field.translate_coordinates(-1, 0);
+        
+        assert!(if let FieldSide::Outside = side { true } else { false });
+        assert_eq!(0, x);
+        assert_eq!(0, y);
+    }
+    
+    #[test]
+    fn translate_coordinates_cliff_over_max_x() {
+        let test_field = Field::create(10, 20, FenceType::Cliff);
+        
+        let (side, x, y) = test_field.translate_coordinates(10, 0);
+        
+        assert!(if let FieldSide::Outside = side { true } else { false });
+        assert_eq!(9, x);
+        assert_eq!(0, y);
+    }
+    
+    #[test]
+    fn translate_coordinates_cliff_negative_y() {
+        let test_field = Field::create(10, 20, FenceType::Cliff);
+        
+        let (side, x, y) = test_field.translate_coordinates(0, -1);
+        
+        assert!(if let FieldSide::Outside = side { true } else { false });
+        assert_eq!(0, x);
+        assert_eq!(0, y);
+    }
+    
+    #[test]
+    fn translate_coordinates_cliff_over_max_y() {
+        let test_field = Field::create(10, 20, FenceType::Cliff);
+        
+        let (side, x, y) = test_field.translate_coordinates(0, 20);
+        
+        assert!(if let FieldSide::Outside = side { true } else { false });
+        assert_eq!(0, x);
+        assert_eq!(19, y);
+    }
+    
+    #[test]
+    fn translate_coordinates_cliff_zero_zero() {
+        let test_field = Field::create(10, 20, FenceType::Cliff);
+        
+        let (side, x, y) = test_field.translate_coordinates(0, 0);
+        
+        assert!(if let FieldSide::Inside = side { true } else { false });
+        assert_eq!(0, x);
+        assert_eq!(0, y);
+    }
+    
+    #[test]
+    fn translate_coordinates_cliff_max_max() {
+        let test_field = Field::create(10, 20, FenceType::Cliff);
+        
+        let (side, x, y) = test_field.translate_coordinates(9, 19);
+        
+        assert!(if let FieldSide::Inside = side { true } else { false });
+        assert_eq!(9, x);
         assert_eq!(19, y);
     }
 }

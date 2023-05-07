@@ -5,11 +5,25 @@ use life::field;
 use life::field::FenceType::*;
 
 fn main() {
-    let new_field = field::Field::create(10,10, Cliff);
-    println!("{}", new_field.population.len());
+    let console = display::Display::create(display::Id::CONSOLE, 4, 4);
+    let mut block = field::Field::create(4, 4, Cliff);
+
+    block.population[1][1] = true;
+    block.population[1][2] = true;
+    block.population[2][1] = true;
+    block.population[2][2] = true;
+
+    console.draw(&block.population);
     
-    let test : &bool = &new_field.population[0][0];
-    println!("{}", test);
+    block.update(1);
+    
+    console.draw(&block.population);
+    
+    // let new_field = field::Field::create(10,10, Cliff);
+    // println!("{}", new_field.population.len());
+    
+    // let test : &bool = &new_field.population[0][0];
+    // println!("{}", test);
     
     //new_field.cell[0][0].alive = Some(&new_field.population[0][0]);
     //println!("{}", test);
