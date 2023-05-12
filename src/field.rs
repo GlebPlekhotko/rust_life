@@ -215,7 +215,6 @@ impl Field {
     }
     
     fn inhabitant(&mut self, x : i32, y : i32) -> &mut bool {
-        let (x_copy, y_copy) = (x, y);
         let (side, x, y) = self.translate_coordinates(x, y);
         
         match side {
@@ -224,7 +223,7 @@ impl Field {
             FieldSide::Bottom => &mut self.fence.as_mut().unwrap().bottom_population[x][y],
             FieldSide::Left   => &mut self.fence.as_mut().unwrap().left_population[x][y],
             FieldSide::Right  => &mut self.fence.as_mut().unwrap().right_population[x][y],
-            FieldSide::Outside => panic!("Non-existing inhabitant referenced {} {}", x_copy, y_copy)
+            FieldSide::Outside => panic!("Non-existing inhabitant referenced")
         }
     }
     
@@ -407,10 +406,10 @@ impl Field {
         
         if let FenceType::FadeAway = self.fence_type {
             x_start = x_start - self.fence.as_ref().unwrap().left_population.len() as i32;
-            x_end = x_end + self.fence.as_ref().unwrap().right_population.len() as i32;
+            x_end = x_end + self.fence.as_ref().unwrap().right_population.len() as i32 - 1;
             
             y_start = y_start - self.fence.as_ref().unwrap().top_population[0].len() as i32;
-            y_end = y_end + self.fence.as_ref().unwrap().bottom_population[0].len() as i32;
+            y_end = y_end + self.fence.as_ref().unwrap().bottom_population[0].len() as i32 - 1;
         }
 
         for _cycle in 0..cycles {
@@ -466,9 +465,10 @@ mod tests {
         assert_eq!(0, x);
         assert_eq!(0, y);
     }
-    
+
     #[test]
     fn translate_coordinates_inside_max_max() {
+
         let test_field = Field::create(10, 20, FenceType::FadeAway);
         
         let (side, x, y) = test_field.translate_coordinates(9, 19);

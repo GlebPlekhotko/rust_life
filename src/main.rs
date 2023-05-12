@@ -5,13 +5,12 @@ use life::field;
 use life::field::FenceType::*;
 
 fn main() {
-    let console = display::Display::create(display::Id::CONSOLE, 4, 4);
-    let mut block = field::Field::create(4, 4, Cliff);
+    let console = display::Display::create(display::Id::CONSOLE, 5, 5);
+    let mut block = field::Field::create(5, 5, Cliff);
 
-    block.population[1][1] = true;
-    block.population[1][2] = true;
-    block.population[2][1] = true;
-    block.population[2][2] = true;
+    block.population[2][4] = true;
+    block.population[3][4] = true;
+    block.population[4][4] = true;
 
     console.draw(&block.population);
     
