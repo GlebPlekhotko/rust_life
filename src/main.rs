@@ -5,18 +5,28 @@ use life::field;
 use life::field::FenceType::*;
 
 fn main() {
-    let console = display::Display::create(display::Id::CONSOLE, 5, 5);
-    let mut block = field::Field::create(5, 5, Cliff);
+    let console = display::Display::create(display::Id::CONSOLE, 6, 6);
+    let mut glider = field::Field::create(6, 6, Cliff);
+    let mut expected = field::Field::create(6, 6, Cliff);
 
-    block.population[2][4] = true;
-    block.population[3][4] = true;
-    block.population[4][4] = true;
+    glider.population[3][4] = true;
+    glider.population[4][5] = true;
+    glider.population[5][3] = true;
+    glider.population[5][4] = true;
+    glider.population[5][5] = true;
 
-    console.draw(&block.population);
+    console.draw(&glider.population);
     
-    block.update(1);
+    glider.update(1);
     
-    console.draw(&block.population);
+    console.draw(&glider.population);
+
+    expected.population[4][3] = true;
+    expected.population[4][5] = true;
+    expected.population[5][4] = true;
+    expected.population[5][4] = true;
+
+    console.draw(&expected.population);
     
     // let new_field = field::Field::create(10,10, Cliff);
     // println!("{}", new_field.population.len());
