@@ -1,5 +1,6 @@
 mod cliff;
 mod fade_away;
+mod warp;
 
 use life::field::*;
 use life::field::FenceType::*;

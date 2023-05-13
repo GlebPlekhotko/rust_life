@@ -6,8 +6,8 @@ use life::field::FenceType::*;
 
 fn main() {
     let console = display::Display::create(display::Id::CONSOLE, 6, 6);
-    let mut glider = field::Field::create(6, 6, Cliff);
-    let mut expected = field::Field::create(6, 6, Cliff);
+    let mut glider = field::Field::create(6, 6, Warp);
+    let mut expected = field::Field::create(6, 6, Warp);
 
     glider.population[3][4] = true;
     glider.population[4][5] = true;
@@ -15,9 +15,15 @@ fn main() {
     glider.population[5][4] = true;
     glider.population[5][5] = true;
 
+    expected.population[0][1] = true;
+    expected.population[1][2] = true;
+    expected.population[2][0] = true;
+    expected.population[2][1] = true;
+    expected.population[2][2] = true; 
+
     console.draw(&glider.population);
     
-    glider.update(1);
+    glider.update(12);
     
     console.draw(&glider.population);
 
@@ -26,7 +32,7 @@ fn main() {
     expected.population[5][4] = true;
     expected.population[5][4] = true;
 
-    console.draw(&expected.population);
+//    console.draw(&expected.population);
     
     // let new_field = field::Field::create(10,10, Cliff);
     // println!("{}", new_field.population.len());

@@ -2,7 +2,7 @@ use life::field::*;
 use life::field::FenceType::*;
 
 #[test]
-fn block_cliff() {
+fn block() {
     let mut block = Field::create(4, 4, Cliff);
     let mut expected = Field::create(4, 4, Cliff);
 
@@ -22,7 +22,7 @@ fn block_cliff() {
 }
 
 #[test]
-fn hive_cliff() {
+fn hive() {
     let mut hive = Field::create(6, 5, Cliff);
     let mut expected = Field::create(6, 5, Cliff);
 
@@ -46,7 +46,7 @@ fn hive_cliff() {
 }
 
 #[test]
-fn blinker_cliff_first_generation() {
+fn blinker_first_generation() {
     let mut blinker = Field::create(5, 5, Cliff);
     let mut expected = Field::create(5, 5, Cliff);
 
@@ -63,7 +63,7 @@ fn blinker_cliff_first_generation() {
 }
 
 #[test]
-fn blinker_cliff_second_generation() {
+fn blinker_second_generation() {
     let mut blinker = Field::create(5, 5, Cliff);
     let mut expected = Field::create(5, 5, Cliff);
 
@@ -77,7 +77,7 @@ fn blinker_cliff_second_generation() {
 }
 
 #[test]
-fn toad_cliff_first_generation() {
+fn toad_first_generation() {
     let mut toad = Field::create(6, 6, Cliff);
     let mut expected = Field::create(6, 6, Cliff);
 
@@ -100,7 +100,7 @@ fn toad_cliff_first_generation() {
 }
 
 #[test]
-fn toad_cliff_second_generation() {
+fn toad_second_generation() {
     let mut toad = Field::create(6, 6, Cliff);
     let mut expected = Field::create(6, 6, Cliff);
 
@@ -121,7 +121,7 @@ fn toad_cliff_second_generation() {
 }
 
 #[test]
-fn glider_cliff_first_generation() {
+fn glider_first_generation() {
     let mut glider = Field::create(6, 6, Cliff);
     let mut expected = Field::create(6, 6, Cliff);
 
@@ -142,7 +142,7 @@ fn glider_cliff_first_generation() {
 }
 
 #[test]
-fn glider_cliff_second_generation() {
+fn glider_second_generation() {
     let mut glider = Field::create(6, 6, Cliff);
     let mut expected = Field::create(6, 6, Cliff);
 
@@ -162,7 +162,7 @@ fn glider_cliff_second_generation() {
 }
 
 #[test]
-fn glider_cliff_third_generation() {
+fn glider_third_generation() {
     let mut glider = Field::create(6, 6, Cliff);
     let mut expected = Field::create(6, 6, Cliff);
 
@@ -183,7 +183,7 @@ fn glider_cliff_third_generation() {
 }
 
 #[test]
-fn glider_cliff_fourth_generation() {
+fn glider_fourth_generation() {
     let mut glider = Field::create(6, 6, Cliff);
     let mut expected = Field::create(6, 6, Cliff);
 
@@ -204,7 +204,7 @@ fn glider_cliff_fourth_generation() {
 }
 
 #[test]
-fn glider_cliff_fifth_generation() {
+fn glider_fifth_generation() {
     let mut glider = Field::create(6, 6, Cliff);
     let mut expected = Field::create(6, 6, Cliff);
 
@@ -225,7 +225,7 @@ fn glider_cliff_fifth_generation() {
 }
 
 #[test]
-fn glider_cliff_sixth_generation() {
+fn glider_sixth_generation() {
     let mut glider = Field::create(6, 6, Cliff);
     let mut expected = Field::create(6, 6, Cliff);
 

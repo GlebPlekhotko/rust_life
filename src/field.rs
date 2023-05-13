@@ -1,6 +1,7 @@
 pub enum FenceType {
     Cliff,
-    FadeAway
+    FadeAway,
+    Warp
 }
 
 enum FieldSide {
@@ -18,6 +19,7 @@ struct Cell {
 }
 
 struct Fence {
+
     top_population : Vec<Vec<bool>>,
     top_cell : Vec<Vec<Cell>>,
     
@@ -252,29 +254,51 @@ impl Field {
         let mut side : FieldSide = FieldSide::Inside;
         
         loop {
-             if let FenceType::Cliff = self.fence_type {
-                 if x < 0 {
-                     x = 0;
-                     side = FieldSide::Outside;
-                 }
+            if let FenceType::Cliff = self.fence_type {
+                if x < 0 {
+                    x = 0;
+                    side = FieldSide::Outside;
+                }
+                
+                if x >= x_max {
+                    x = x_max - 1;
+                    side = FieldSide::Outside;
+                }
                  
-                 if x >= x_max {
-                     x = x_max - 1;
-                     side = FieldSide::Outside;
-                 }
+                if y < 0 {
+                    y = 0;
+                    side = FieldSide::Outside;
+                }
                  
-                 if y < 0 {
-                     y = 0;
-                     side = FieldSide::Outside;
-                 }
+                if y >= y_max {
+                    y = y_max - 1;
+                    side = FieldSide::Outside;
+                }
                  
-                 if y >= y_max {
-                     y = y_max - 1;
-                     side = FieldSide::Outside;
-                 }
+                break;
+            }
+
+            if let FenceType::Warp = self.fence_type {
+                if x < 0 {
+                    x = x_max - 1;
+                }
+                
+                if x >= x_max {
+                    x = 0;
+                }
                  
-                 break;
-             }
+                if y < 0 {
+                    y = y_max - 1;
+                }
+                 
+                if y >= y_max {
+                    y = 0;
+                }
+
+                side = FieldSide::Inside;
+
+                break;
+            }
             
             /* If "y" coordinate is negative, then we address the cell in the "top" fence area which possesses the
                following layout:
