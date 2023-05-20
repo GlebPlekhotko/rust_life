@@ -45,6 +45,9 @@ pub struct Field {
     pub alive : u32,
 }
 
+
+/// This is a helpef function, which compares public areas of the two fields
+
 pub fn equal(first : &Field, second : &Field) -> bool {
     let mut are_equal = true;
     
@@ -92,6 +95,9 @@ pub fn equal(first : &Field, second : &Field) -> bool {
 }
 
 impl Field {
+    
+    /// Creates instance structure's instance
+
     pub fn create(x_size : u32, y_size : u32, fence : FenceType) -> Self {
         if x_size == 0 || y_size == 0 {
             panic!("Field cannot be zero in size!");
@@ -202,7 +208,13 @@ impl Field {
         
         new_field
     }
+
     
+    /// Returns a reference to a cell with a given coordinates
+
+    /** Note, that function performs coordinates translation, which depends on the exact fence type. So the coordinates
+        may be both positive and negave ones. */
+
     fn cell(&mut self, x : i32, y : i32) -> &mut Cell {
         let (side, x, y) = self.translate_coordinates(x, y);
         
@@ -215,6 +227,9 @@ impl Field {
             FieldSide::Outside => panic!("Non-existing cell referenced")
         }
     }
+
+    
+    /// Returns mutable reference to the cell at a given coordinates,
     
     fn inhabitant(&mut self, x : i32, y : i32) -> &mut bool {
         let (side, x, y) = self.translate_coordinates(x, y);
@@ -229,6 +244,9 @@ impl Field {
         }
     }
     
+
+    /// Randomly populates public area, density might be in the range (0..1)
+
     pub fn populate_randomly(&mut self, density : f32) {
         if (density == 0.0) || (density >= 1.0) {
             panic!("Population density must be above 0 and below 1.0");
@@ -247,13 +265,24 @@ impl Field {
             }
         }
     }
+
     
+    /// Translates absolute coordinates depending on the fence type in use to the "side area, side x, side y"
+    
+    /** The idea behind this translation is the following. The non-static patterns like glider or hive might be 
+        distorted when found close to or crossing edge of the public area. If that's the point of concern the "Fade 
+        Away" or "Warp" fences might be chosen. The latter assumes that the sides of the public area are "connected"
+        to the oposing side, while formere allocates auxiliary private (invisible) feidls wide enough to guarantee
+        fence traversing of the longest expected pattern without distoring it. See the "create" function for more 
+        information. */
+
     fn translate_coordinates(&self, mut x : i32, mut y : i32) -> (FieldSide, usize, usize) {
         let x_max = self.population.len() as i32;
         let y_max = self.population[0].len() as i32;
         let mut side : FieldSide = FieldSide::Inside;
         
         loop {
+            // The "Cliff" fence means all the cells outside of the public area are "dead" ones
             if let FenceType::Cliff = self.fence_type {
                 if x < 0 {
                     x = 0;
@@ -278,6 +307,7 @@ impl Field {
                 break;
             }
 
+            // The "Warp" means the sides of the public area are connected to each other
             if let FenceType::Warp = self.fence_type {
                 if x < 0 {
                     x = x_max - 1;
@@ -299,6 +329,9 @@ impl Field {
 
                 break;
             }
+
+            /* The "Fade Away" fence allocates additional fields by the each side of the "public" area. Outside of that
+               auxuliary fields is considered dead. So the moving colonies vanish in the end. */
             
             /* If "y" coordinate is negative, then we address the cell in the "top" fence area which possesses the
                following layout:
@@ -392,14 +425,20 @@ impl Field {
         (side, x as usize, y as usize)
     }
     
+    
+    /// Returns true if the cell at a given coordinates is alive
+
     fn alive(&mut self, x : i32, y : i32) -> bool {
         return *self.inhabitant(x, y);
     }
     
-    fn neighbours(&mut self, x : i32, y : i32) -> u32 {
+
+    /// Returns number of the neighbors of the given cell
+
+    fn neighbors(&mut self, x : i32, y : i32) -> u32 {
         let x_width = self.population.len() as i32;
         let y_width = self.population[0].len() as i32;
-        let mut neighbours = 0;
+        let mut neighbors = 0;
         
         for x_neighbour in x - 1 ..= x + 1 {
             for y_neighbour in y - 1 ..= y + 1 {
@@ -414,14 +453,24 @@ impl Field {
                 }
                 
                 if self.alive(x_neighbour, y_neighbour) == true {
-                    neighbours += 1;
+                    neighbors += 1;
                 }
             }
         }
         
-        neighbours
+        neighbors
     }
     
+
+    /// Updates the field
+
+    /** The rules of the update (generation change) are the following:
+          - if cell is dead and there are exactly 3 neighbors then cell becomes alive;
+          - if cell is alive and there are 2 or 3 neighbors, then cell remains alive (unchanged);
+          - if cell is alive and there are less than 2 or more than 3 neighbors it dies;
+         The cells die or come to live during generation change, or in other words, first calculate transitions for all
+         cells and then apply them at once. Not on "one by one" basis.   */
+
     pub fn update(&mut self, cycles : u32) {
         let mut x_start = 0 as i32;
         let mut x_end = self.population.len() as i32;
@@ -439,15 +488,15 @@ impl Field {
         for _cycle in 0..cycles {
             for x in x_start..x_end {
                 for y in y_start..y_end {
-                    let cell_neighbours = self.neighbours(x, y);
+                    let cell_neighbors = self.neighbors(x, y);
                     
                     if self.alive(x, y) == true {
-                        if cell_neighbours < 2 || cell_neighbours > 3 {
+                        if cell_neighbors < 2 || cell_neighbors > 3 {
                             self.cell(x, y).kill = true;
                             self.cell(x, y).hatch = false;
                         }
                     } else {
-                        if cell_neighbours == 3 {
+                        if cell_neighbors == 3 {
                             self.cell(x, y).kill = true;
                             self.cell(x, y).hatch = true;
                         }
