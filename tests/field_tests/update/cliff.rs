@@ -65,7 +65,7 @@ fn blinker_first_generation() {
 #[test]
 fn blinker_second_generation() {
     let mut blinker = Field::create(5, 5, Cliff);
-    let mut expected = Field::create(5, 5, Cliff);
+    let expected = Field::create(5, 5, Cliff);
 
     blinker.population[2][4] = true;
     blinker.population[3][4] = true;

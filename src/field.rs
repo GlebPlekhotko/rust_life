@@ -170,7 +170,7 @@ impl Field {
                 } 
             );
             
-            let mut fence = new_field.fence.as_mut().unwrap();
+            let fence = new_field.fence.as_mut().unwrap();
             
             // Here top and bottom fences are created. Their width must be "multiply by 2" of the largest pattern
             for x in 0..(x_size + largest_pattern * 2) {
@@ -436,8 +436,6 @@ impl Field {
     /// Returns number of the neighbors of the given cell
 
     fn neighbors(&mut self, x : i32, y : i32) -> u32 {
-        let x_width = self.population.len() as i32;
-        let y_width = self.population[0].len() as i32;
         let mut neighbors = 0;
         
         for x_neighbour in x - 1 ..= x + 1 {

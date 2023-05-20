@@ -226,7 +226,7 @@ fn glider_fifth_generation() {
 #[test]
 fn glider_sixth_generation() {
     let mut glider = Field::create(6, 6, FadeAway);
-    let mut expected = Field::create(6, 6, FadeAway);
+    let expected = Field::create(6, 6, FadeAway);
 
     glider.population[3][4] = true;
     glider.population[4][5] = true;
