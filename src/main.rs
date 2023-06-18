@@ -1,61 +1,45 @@
 mod display;
-//mod field;
+mod arguments;
 
 use life::field;
 use life::field::FenceType::*;
+use std::env;
 
 fn main() {
-    let console = display::Display::create(display::Id::CONSOLE, 6, 6);
-    let mut glider = field::Field::create(6, 6, Warp);
-    let mut expected = field::Field::create(6, 6, Warp);
+    let args_string : Vec<String> = env::args().collect();
 
-    glider.population[3][4] = true;
-    glider.population[4][5] = true;
-    glider.population[5][3] = true;
-    glider.population[5][4] = true;
-    glider.population[5][5] = true;
+    //for arg in args {
+    //    println!("{}", arg);
+    //}
 
-    expected.population[0][1] = true;
-    expected.population[1][2] = true;
-    expected.population[2][0] = true;
-    expected.population[2][1] = true;
-    expected.population[2][2] = true; 
+    //let test = arguments::parse(args);
 
-    console.draw(&glider.population);
+    //let console = display::Display::create(display::Id::CONSOLE, 6, 6);
+    //let mut glider = field::Field::create(6, 6, Warp);
+    //let mut expected = field::Field::create(6, 6, Warp);
+
+    //glider.population[3][4] = true;
+    //glider.population[4][5] = true;
+    //glider.population[5][3] = true;
+    //glider.population[5][4] = true;
+    //glider.population[5][5] = true;
+
+    //expected.population[0][1] = true;
+    //expected.population[1][2] = true;
+    //expected.population[2][0] = true;
+    //expected.population[2][1] = true;
+    //expected.population[2][2] = true; 
+
+    //console.draw(&glider.population);
     
-    glider.update(12);
+    //glider.update(12);
     
-    console.draw(&glider.population);
+    //console.draw(&glider.population);
 
-    expected.population[4][3] = true;
-    expected.population[4][5] = true;
-    expected.population[5][4] = true;
-    expected.population[5][4] = true;
+    //expected.population[4][3] = true;
+    //expected.population[4][5] = true;
+    //expected.population[5][4] = true;
+    //expected.population[5][4] = true;
 
-//    console.draw(&expected.population);
-    
-    // let new_field = field::Field::create(10,10, Cliff);
-    // println!("{}", new_field.population.len());
-    
-    // let test : &bool = &new_field.population[0][0];
-    // println!("{}", test);
-    
-    //new_field.cell[0][0].alive = Some(&new_field.population[0][0]);
-    //println!("{}", test);
-    
-    //let mut test_field = field::create(20, 10);
-    //field::random_populate(&mut test_field.cell, 0.1);
-    
-    //let console = display::Display::create(display::Id::CONSOLE, 20, 10);
-    //console.draw(&test_field.cell);
-	
-	//test_input[0][0].alive = true;
-
-    //console.draw(&test_input);
-
-    //field::update(&mut test_input);
-    //console.draw(&test_input);
-
-    //field::update(&mut test_input);
-    //console.draw(&test_input);
+    let args = arguments::parse(args_string);
 }
