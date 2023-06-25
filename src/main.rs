@@ -1,18 +1,14 @@
 mod display;
 mod arguments;
+mod input;
+mod file_formats;
 
 use life::field;
 use life::field::FenceType::*;
 use std::env;
 
 fn main() {
-    let args_string : Vec<String> = env::args().collect();
-
-    //for arg in args {
-    //    println!("{}", arg);
-    //}
-
-    //let test = arguments::parse(args);
+    let format = file_formats::deduce("test.cells".to_string());
 
     //let console = display::Display::create(display::Id::CONSOLE, 6, 6);
     //let mut glider = field::Field::create(6, 6, Warp);
@@ -41,5 +37,5 @@ fn main() {
     //expected.population[5][4] = true;
     //expected.population[5][4] = true;
 
-    let args = arguments::parse(args_string);
+    //let args = arguments::parse(args_string);
 }
