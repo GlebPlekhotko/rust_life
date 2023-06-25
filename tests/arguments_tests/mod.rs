@@ -9,6 +9,7 @@ fn empty_arguments_string() {
 
         generations : 0,
         output_each_generation : false,
+        density : 0.0,
 
         input_file : None,
         output_file : None
@@ -28,6 +29,7 @@ fn one_argument_string() {
 
         generations : 0,
         output_each_generation : false,
+        density : 0.0,
 
         input_file : None,
         output_file : None
@@ -49,6 +51,7 @@ fn x_size() {
 
         generations : 0,
         output_each_generation : false,
+        density : 0.0,
 
         input_file : None,
         output_file : None
@@ -84,6 +87,7 @@ fn y_size() {
 
         generations : 0,
         output_each_generation : false,
+        density : 0.0,
 
         input_file : None,
         output_file : None
@@ -119,6 +123,7 @@ fn generations() {
 
         generations : 100,
         output_each_generation : false,
+        density : 0.0,
 
         input_file : None,
         output_file : None
@@ -154,6 +159,7 @@ fn output_each_generation() {
 
         generations : 0,
         output_each_generation : true,
+        density : 0.0,
 
         input_file : None,
         output_file : None
@@ -161,6 +167,55 @@ fn output_each_generation() {
 
     input.push(String::from("input"));
     input.push(String::from("-e"));
+
+    let actual = parse(input);
+
+    assert!(expected == actual);
+}
+
+#[test]
+fn density() {
+    let mut input : Vec<String> = Vec::new();
+    let expected = Arguments {
+        x_size : 0,
+        y_size : 0,
+
+        generations : 0,
+        output_each_generation : false,
+        density : 0.5,
+
+        input_file : None,
+        output_file : None
+    };
+
+    input.push(String::from("input"));
+    input.push(String::from("-d"));
+    input.push(String::from("0.5"));
+
+    let actual = parse(input);
+
+    assert!(expected == actual);
+}
+
+#[test]
+#[should_panic]
+fn density_illegal_value_type() {
+    let mut input : Vec<String> = Vec::new();
+    let expected = Arguments {
+        x_size : 0,
+        y_size : 0,
+
+        generations : 0,
+        output_each_generation : false,
+        density : 0.5,
+
+        input_file : None,
+        output_file : None
+    };
+
+    input.push(String::from("input"));
+    input.push(String::from("-d"));
+    input.push(String::from("wrong"));
 
     let actual = parse(input);
 
@@ -176,6 +231,7 @@ fn input_file() {
 
         generations : 0,
         output_each_generation : false,
+        density : 0.0,
 
         input_file : Some("input_file".to_string()),
         output_file : None
@@ -199,6 +255,7 @@ fn input_file_empty_string() {
 
         generations : 0,
         output_each_generation : false,
+        density : 0.0,
 
         input_file : None,
         output_file : None
@@ -222,6 +279,31 @@ fn output_file() {
 
         generations : 0,
         output_each_generation : false,
+        density : 0.0,
+
+        input_file : None,
+        output_file : Some("output_file".to_string()),
+    };
+
+    input.push(String::from("input"));
+    input.push(String::from("-o"));
+    input.push(String::from("output_file"));
+
+    let actual = parse(input);
+
+    assert!(expected == actual);
+}
+
+#[test]
+fn output_file_empty_string() {
+    let mut input : Vec<String> = Vec::new();
+    let expected = Arguments {
+        x_size : 0,
+        y_size : 0,
+
+        generations : 0,
+        output_each_generation : false,
+        density : 0.0,
 
         input_file : None,
         output_file : None
@@ -230,6 +312,100 @@ fn output_file() {
     input.push(String::from("input"));
     input.push(String::from("-o"));
     input.push(String::from(""));
+
+    let actual = parse(input);
+
+    assert!(expected == actual);
+}
+
+#[test]
+fn multiple_arguments() {
+    let mut input : Vec<String> = Vec::new();
+    let expected = Arguments {
+        x_size : 200,
+        y_size : 100,
+
+        generations : 10,
+        output_each_generation : true,
+        density : 0.5,
+
+        input_file : Some("input_file".to_string()),
+        output_file : Some("output_file".to_string())
+    };
+
+    input.push(String::from("input"));
+    input.push(String::from("-x"));
+    input.push(String::from("200"));
+    input.push(String::from("-y"));
+    input.push(String::from("100"));
+    input.push(String::from("-g"));
+    input.push(String::from("10"));
+    input.push(String::from("-e"));
+    input.push(String::from("-d"));
+    input.push(String::from("0.5"));
+    input.push(String::from("-i"));
+    input.push(String::from("input_file"));
+    input.push(String::from("-o"));
+    input.push(String::from("output_file"));
+
+    let actual = parse(input);
+
+    assert!(expected == actual);
+}
+
+#[test]
+fn multiple_arguments_reverse() {
+    let mut input : Vec<String> = Vec::new();
+    let expected = Arguments {
+        x_size : 200,
+        y_size : 100,
+
+        generations : 10,
+        output_each_generation : true,
+        density : 0.5,
+
+        input_file : Some("input_file".to_string()),
+        output_file : Some("output_file".to_string())
+    };
+
+    input.push(String::from("input"));
+    input.push(String::from("-o"));
+    input.push(String::from("output_file"));
+    input.push(String::from("-i"));
+    input.push(String::from("input_file"));
+    input.push(String::from("-d"));
+    input.push(String::from("0.5"));
+    input.push(String::from("-e"));
+    input.push(String::from("-g"));
+    input.push(String::from("10"));
+    input.push(String::from("-y"));
+    input.push(String::from("100"));
+    input.push(String::from("-x"));
+    input.push(String::from("200"));
+
+    let actual = parse(input);
+
+    assert!(expected == actual);
+}
+
+#[test]
+#[should_panic]
+fn no_arguments_value() {
+    let mut input : Vec<String> = Vec::new();
+    let expected = Arguments {
+        x_size : 0,
+        y_size : 0,
+
+        generations : 0,
+        output_each_generation : false,
+        density : 0.0,
+
+        input_file : None,
+        output_file : None
+    };
+
+    input.push(String::from("input"));
+    input.push(String::from("-x"));
 
     let actual = parse(input);
 

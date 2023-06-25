@@ -5,6 +5,7 @@ pub struct Arguments {
 
     pub generations : u32,
     pub output_each_generation : bool,
+    pub density : f32,
 
     pub input_file : Option<String>,
     pub output_file : Option<String>
@@ -15,6 +16,7 @@ enum Switches {
     YSize,
     Generations,
     OutputEachGeneration,
+    Density,
     InputFile,
     OutputFile
 }
@@ -28,6 +30,7 @@ pub fn parse(input : Vec<String>) -> Arguments {
         y_size : 0,
         generations : 0,
         output_each_generation : false,
+        density : 0.0,
         input_file : None,
         output_file : None
     };
@@ -59,12 +62,16 @@ pub fn parse(input : Vec<String>) -> Arguments {
                 Switches::YSize => arguments.y_size = get_unsigned_integer(switch_str),
                 Switches::Generations => arguments.generations = get_unsigned_integer(switch_str),
                 Switches::OutputEachGeneration => arguments.output_each_generation = true,
+                Switches::Density => arguments.density = get_float(switch_str),
                 Switches::InputFile => arguments.input_file = get_string(switch_str),
-                Switches::OutputFile => arguments.output_file = get_string(switch_str),
-                _ => panic!("Something horrible has happened!\n")
+                Switches::OutputFile => arguments.output_file = get_string(switch_str)
             }
 
             switch_expected = true;
+        }
+
+        if switch_expected == false {
+            panic!("No switch value found /n")
         }
     }
 
@@ -86,6 +93,7 @@ fn fetch_switch(switch_str : &String) -> Option<Switches> {
                     'y' => switch = Some(Switches::YSize),
                     'g' => switch = Some(Switches::Generations),
                     'e' => switch = Some(Switches::OutputEachGeneration),
+                    'd' => switch = Some(Switches::Density),
                     'i' => switch = Some(Switches::InputFile),
                     'o' => switch = Some(Switches::OutputFile),
                     _ => ()
@@ -101,6 +109,15 @@ fn fetch_switch(switch_str : &String) -> Option<Switches> {
     }
 
     switch
+}
+
+/// Tries to convert given string to an unsigned integer
+
+fn get_float(value_str : &String) -> f32 {
+    match value_str.trim().parse() {
+        Ok(value) => value,
+        Err(_) => panic!("Wrong switch value\n")
+    }
 }
 
 
