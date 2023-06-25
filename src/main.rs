@@ -1,14 +1,14 @@
 mod display;
 mod arguments;
 mod input;
-mod file_formats;
+mod file;
 
 use life::field;
 use life::field::FenceType::*;
 use std::env;
 
 fn main() {
-    let format = file_formats::deduce("test.cells".to_string());
+    //let format = file_formats::deduce("test.cells".to_string());
 
     //let console = display::Display::create(display::Id::CONSOLE, 6, 6);
     //let mut glider = field::Field::create(6, 6, Warp);
