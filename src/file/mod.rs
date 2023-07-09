@@ -1,7 +1,18 @@
+mod plaintext;
+mod rle;
+
+use std::fs::File;
+use std::io;
+
 enum Formats {
     PlainText,
     Rle,
     Unknown,
+}
+
+pub fn dimensions(path : String) -> Result<(u32, u32), io::Error>
+{
+    Result::Ok((0, 0))
 }
 
 /// Deduce the type of the file by its extension, ".cells" and .rle" for the plaintext and run length encoded
@@ -22,6 +33,12 @@ fn deduce(path : String) -> Formats {
     format
 }
 
+/// Attempts to load (setup) the population using the given file
+
+pub fn load(path : String, population : Vec<Vec<bool>>) -> Result<i32, io::Error>
+{
+    Result::Ok(0)
+}
 
 #[cfg(test)]
 mod tests {

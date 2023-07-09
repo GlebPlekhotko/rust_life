@@ -2,12 +2,19 @@ mod display;
 mod arguments;
 mod input;
 mod file;
+mod errors;
 
 use life::field;
 use life::field::FenceType::*;
 use std::env;
 
 fn main() {
+    //let content = "".to_string();
+
+    //println!("{}", content);
+
+    //file::rle::dimensions("#\nx = 2, y = 2".to_string());
+
     //let format = file_formats::deduce("test.cells".to_string());
 
     //let console = display::Display::create(display::Id::CONSOLE, 6, 6);
