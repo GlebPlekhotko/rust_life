@@ -3,5 +3,8 @@
 pub enum ErrorCode {
     HeaderNotExpected,
     UnrecognizedCharacter,
-    WrongRleHeader
+    WrongRleHeader,
+    UnrecognizedFileFormat,
+    FailedToOpenFile,
+    FailedToReadFile,
 }

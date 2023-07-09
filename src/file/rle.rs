@@ -2,12 +2,13 @@ use crate::errors::ErrorCode;
 
 /// Returns the dimensions of the field in the RLE encoded file
 
-pub fn dimensions(content : String) -> Result<(usize, usize), ErrorCode>
+pub fn dimensions(content : &String) -> Result<(usize, usize), ErrorCode>
 {
     let mut x : usize = 0;
     let mut y : usize = 0;
     let mut header_expected = true;
 
+    'content_loop: 
     for line in content.lines() {
         match line.chars().next() {
             Some(first_char) => match first_char {
@@ -42,6 +43,7 @@ pub fn dimensions(content : String) -> Result<(usize, usize), ErrorCode>
                                                         x_expected = false;
                                                     } else {
                                                         y = value;
+                                                        break 'content_loop;
                                                     }
                                                 }
                                                 None => return Err(ErrorCode::WrongRleHeader)
@@ -65,7 +67,7 @@ mod tests {
     fn empty_content() {
         let content = "".to_string();
 
-        let dimensions = dimensions(content.to_string());
+        let dimensions = dimensions(&content);
 
         assert_eq!((0, 0), dimensions.unwrap());
     }
@@ -74,7 +76,7 @@ mod tests {
     fn only_header() {
         let content = "#".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         assert_eq!((0, 0), dimensions.unwrap());
     }
@@ -83,7 +85,7 @@ mod tests {
     fn wrong_header_marker() {
         let content = "!".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         match dimensions {
             Ok(_) => assert!(false),
@@ -102,7 +104,7 @@ mod tests {
         let content = "#\n\
                        z = 1, y = 1".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         match dimensions {
             Ok(_) => assert!(false),
@@ -121,7 +123,7 @@ mod tests {
         let content = "#\n\
                        x = 1, z = 1".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         match dimensions {
             Ok(_) => assert!(false),
@@ -140,7 +142,7 @@ mod tests {
         let content = "#\n\
                        x = 1; z = 1".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         match dimensions {
             Ok(_) => assert!(false),
@@ -159,7 +161,7 @@ mod tests {
         let content = "#\n\
                        x = 2, y = 2".to_string();
 
-        let dimensions = dimensions(content.to_string());
+        let dimensions = dimensions(&content);
 
         assert_eq!((2, 2), dimensions.unwrap());
     }
@@ -169,7 +171,21 @@ mod tests {
         let content = "#\n\
                        x = 3, y = 4".to_string();
 
-        let dimensions = dimensions(content.to_string());
+        let dimensions = dimensions(&content);
+
+        assert_eq!((3, 4), dimensions.unwrap());
+    }
+
+    #[test]
+    fn three_by_four_with_data() {
+        let content = "#\n\
+                       x = 3, y = 4\n\
+                       bo$\
+                       2bo$\
+                       o2b$\
+                       3o!".to_string();
+
+        let dimensions = dimensions(&content);
 
         assert_eq!((3, 4), dimensions.unwrap());
     }

@@ -2,7 +2,7 @@ use crate::errors::ErrorCode;
 
 /// Returns the dimensions of the field in the plaintext encoded file
 
-pub fn dimensions(content : String) -> Result<(usize, usize), ErrorCode>
+pub fn dimensions(content : &String) -> Result<(usize, usize), ErrorCode>
 {
     let mut x : usize = 0;
     let mut y : usize = 0;
@@ -42,7 +42,7 @@ mod tests {
     fn empty_content() {
         let content = "".to_string();
 
-        let dimensions = dimensions("".to_string());
+        let dimensions = dimensions(&content);
 
         assert_eq!((0, 0), dimensions.unwrap());
     }
@@ -53,7 +53,7 @@ mod tests {
                        !First line\n\
                        O.\n".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         assert_eq!(ErrorCode::HeaderNotExpected, dimensions.err().unwrap());
     }
@@ -65,7 +65,7 @@ mod tests {
                        .O\n\
                        o.\n".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         assert_eq!(ErrorCode::UnrecognizedCharacter, dimensions.err().unwrap());
     }
@@ -74,7 +74,7 @@ mod tests {
     fn one_line_header() {
         let content = "!First line\n".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         assert_eq!((0, 0), dimensions.unwrap());
     }
@@ -84,7 +84,7 @@ mod tests {
         let content = "!First line\n\
                        !\n".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         assert_eq!((0, 0), dimensions.unwrap());
     }
@@ -96,7 +96,7 @@ mod tests {
                        .O\n\
                        O.\n".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         assert_eq!((2, 2), dimensions.unwrap());
     }
@@ -110,7 +110,7 @@ mod tests {
                        .O.\n\
                        O..\n".to_string();
 
-        let dimensions = dimensions(content);
+        let dimensions = dimensions(&content);
 
         assert_eq!((3, 4), dimensions.unwrap());
     }
