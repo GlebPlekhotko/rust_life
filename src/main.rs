@@ -9,11 +9,17 @@ use life::field::FenceType::*;
 use std::env;
 
 fn main() {
-    let file_path = "tests/file_tests/run_length_encoded.rle".to_string();
-    let mut x = 0;
-    let mut y = 0;
+    let content = "!\n\
+                   O.\n\
+                   .0".to_string();
+    let mut field : Vec<Vec<bool>> = Vec::new();
     
-    let result = file::dimensions(&file_path);
+    field.push(Vec::new());
+    field.push(Vec::new());
+    field[0].push(false); field[0].push(false);
+    field[1].push(false); field[1].push(false);
+
+    let result = file::plaintext::load(&mut field, &content);
 
     //let console = display::Display::create(display::Id::CONSOLE, 6, 6);
     //let mut glider = field::Field::create(6, 6, Warp);

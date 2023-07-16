@@ -7,4 +7,5 @@ pub enum ErrorCode {
     UnrecognizedFileFormat,
     FailedToOpenFile,
     FailedToReadFile,
+    FieldTooSmall
 }
