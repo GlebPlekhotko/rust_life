@@ -78,7 +78,20 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
             x += 1;
         }
 
+        while x < x_field {
+            field[x][y] = false;
+            x += 1;
+        }
+
         x = 0;
+        y += 1;
+    }
+
+    while y < y_field {
+        for x in 0..x_field {
+            field[x][y] = false;
+        }
+
         y += 1;
     }
 
