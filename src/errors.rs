@@ -7,5 +7,7 @@ pub enum ErrorCode {
     UnrecognizedFileFormat,
     FailedToOpenFile,
     FailedToReadFile,
-    FieldTooSmall
+    FieldTooSmall,
+    RleVolationXSize,
+    RleVolationYSize
 }

@@ -9,17 +9,32 @@ use life::field::FenceType::*;
 use std::env;
 
 fn main() {
-    let content = "!\n\
-                   O.\n\
-                   .0".to_string();
+    let content = "x = 10, y = 2\n\
+                   10o!".to_string();
     let mut field : Vec<Vec<bool>> = Vec::new();
     
-    field.push(Vec::new());
-    field.push(Vec::new());
-    field[0].push(false); field[0].push(false);
-    field[1].push(false); field[1].push(false);
+    for row in 0..10 {
+        field.push(Vec::new());
+        for cell in 0..2 {
+            field[row].push(false);
+        }
+    }
 
-    let result = file::plaintext::load(&mut field, &content);
+    let result = file::rle::load(&mut field, &content);
+
+    for y in 0..field[0].len() {
+        for x in 0..field.len() {
+            print!("{} ", field[x][y]);
+        }
+        println!("");
+    }
+
+     if let Ok(()) = result {
+        println!("Result ok");
+    } else {
+        println!("Result not ok {:?}", result);
+    }
+
 
     //let console = display::Display::create(display::Id::CONSOLE, 6, 6);
     //let mut glider = field::Field::create(6, 6, Warp);

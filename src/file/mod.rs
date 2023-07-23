@@ -1,5 +1,5 @@
-pub mod plaintext;
-mod rle;
+mod plaintext;
+pub mod rle;
 
 use crate::errors::ErrorCode;
 use std::fs::File;

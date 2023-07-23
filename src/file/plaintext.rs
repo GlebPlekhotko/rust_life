@@ -273,7 +273,7 @@ mod tests {
             field[0].push(false); field[0].push(false); field[0].push(false);
             field[1].push(false); field[1].push(false); field[1].push(false);
             field[2].push(false); field[2].push(false); field[2].push(false);
-            field[3].push(false); field[3].push(false); field[3].push(false);
+            field[3].push(false); field[3].push(false); field[3].push(true);
 
             let result = load(&mut field, &content);
 
