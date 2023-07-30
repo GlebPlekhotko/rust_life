@@ -40,11 +40,11 @@ pub fn dimensions(content : &String) -> Result<(usize, usize), ErrorCode>
 
 pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorCode>
 {
-    let x_field = field.len();
-    let y_field = field[0].len();
+    let x_size = field.len();
+    let y_size = field[0].len();
     let (x_content, y_content) = dimensions(content)?;
     
-    if (x_field < x_content) || (y_field < y_content) {
+    if (x_size < x_content) || (y_size < y_content) {
         return Err(ErrorCode::FieldTooSmall);
     }
 
@@ -78,7 +78,7 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
             x += 1;
         }
 
-        while x < x_field {
+        while x < x_size {
             field[x][y] = false;
             x += 1;
         }
@@ -87,8 +87,8 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
         y += 1;
     }
 
-    while y < y_field {
-        for x in 0..x_field {
+    while y < y_size {
+        for x in 0..x_size {
             field[x][y] = false;
         }
 
@@ -102,11 +102,21 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
 
 pub fn save(field : & Vec<Vec<bool>>, content : &mut String) -> Result<(), ErrorCode>
 {
+    let x_size : usize;
+    let y_size : usize;
+
+    x_size = field.len();
+    if x_size > 0 {
+        y_size = field[0].len();
+    } else {
+        y_size = 0;
+    }
+
     content.clear();
 
-    for row in field {
-        for cell in row {
-            if *cell == true {
+    for y in 0..y_size {
+        for x in 0..x_size {
+            if field[x][y] == true {
                 content.push_str("O");
             } else {
                 content.push_str(".");
@@ -333,31 +343,97 @@ mod tests {
         }
 
         #[test]
-        fn one_row() {
+        fn all_dead() {
             let mut field : Vec<Vec<bool>> = Vec::new();
             let mut content = String::new();
 
-            field.push(Vec::new());
-            //field[0].push(false);
-            //field[0].push(true);
-            //field[0].push(false);
-            //field[0].push(true);
-            //field[0].push(false);
-            for row in &field {
-                //*row.push(false);
-                //for cell in 0..5 {
-                //    if cell % 2 == 0 {
-                //        row.push(false);
-                //    } else {
-                //        row.push(true);
-                //    }
-                //}
+            for row in 0..5 {
+                field.push(Vec::new());
+
+                for cell in 0..4 {
+                    field[row].push(false);
+                }
             }
 
             let result = save(&field, &mut content);
 
             assert!(if let Ok(()) = result {true} else {false});
-            assert_eq!(".O.O.\r\n".to_string(), content);
+            assert_eq!(".....\r\n\
+                        .....\r\n\
+                        .....\r\n\
+                        .....\r\n".to_string(), content);
+        }
+
+        #[test]
+        fn one_alive_in_the_first_cell() {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            let mut content = String::new();
+
+            for row in 0..5 {
+                field.push(Vec::new());
+
+                for cell in 0..4 {
+                    field[row].push(false);
+                }
+            }
+            field[0][0] = true;
+
+            let result = save(&field, &mut content);
+
+            assert!(if let Ok(()) = result {true} else {false});
+            assert_eq!("O....\r\n\
+                        .....\r\n\
+                        .....\r\n\
+                        .....\r\n".to_string(), content);
+        }
+
+        #[test]
+        fn one_alive_in_the_last_cell() {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            let mut content = String::new();
+
+            for row in 0..5 {
+                field.push(Vec::new());
+
+                for cell in 0..4 {
+                    field[row].push(false);
+                }
+            }
+            field[4][3] = true;
+
+            let result = save(&field, &mut content);
+
+            assert!(if let Ok(()) = result {true} else {false});
+            assert_eq!(".....\r\n\
+                        .....\r\n\
+                        .....\r\n\
+                        ....O\r\n".to_string(), content);
+        }
+
+        #[test]
+        fn glider() {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            let mut content = String::new();
+
+            for row in 0..5 {
+                field.push(Vec::new());
+
+                for cell in 0..4 {
+                    field[row].push(false);
+                }
+            }
+            field[1][0] = true;
+            field[2][1] = true;
+            field[0][2] = true; field[1][2] = true; field[2][2] = true;
+
+
+            let result = save(&field, &mut content);
+
+            assert!(if let Ok(()) = result {true} else {false});
+            assert_eq!(".O...\r\n\
+                        ..O..\r\n\
+                        OOO..\r\n\
+                        .....\r\n".to_string(), content);
         }
     }
 }

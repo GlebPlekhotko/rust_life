@@ -188,6 +188,94 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
     Ok(())
 }
 
+/// Saves content of the field to the given string
+
+pub fn save(field : & Vec<Vec<bool>>, content : &mut String) -> Result<(), ErrorCode>
+{
+    let alive_cell = "o";
+    let dead_cell = "b";
+    let x_size : usize;
+    let y_size : usize;
+    let mut cell_char : &str = alive_cell;
+    let mut run_length = 0;
+
+    x_size = field.len();
+    if x_size > 0 {
+        y_size = field[0].len();
+    } else {
+        y_size = 0;
+    }
+
+    content.clear();
+    
+    content.push_str(&format!("x = {}, y = {}\r\n", x_size, y_size));
+    if x_size == 0 || y_size == 0 {
+        return Ok(());
+    }    
+
+
+    let mut first_row = true;
+
+    for y in 0..y_size {
+        let mut smth_printed = false;
+        let mut new_row = true;
+        let mut previous_cell = false;
+
+        run_length = 0;
+
+        for x in 0..x_size {
+            if x == 0 {
+                previous_cell = field[x][y];
+
+                if y > 0 {
+                    content.push_str("$\r\n");
+                }
+            }
+
+            if field[x][y] == previous_cell {
+                run_length += 1;   
+                continue;             
+            }
+
+            if previous_cell == true {
+                cell_char = alive_cell;
+            } else {
+                cell_char = dead_cell;
+            }
+
+            if run_length > 1 {
+                content.push_str(&format!("{}", run_length));
+            }
+            content.push_str(cell_char);
+
+            smth_printed = true;
+            previous_cell = field[x][y];
+            run_length = 1;
+        }
+
+        if previous_cell == true {
+            if run_length > 1 {
+                content.push_str(&format!("{}", run_length));
+            }
+            content.push_str(alive_cell);
+        } else {
+            if smth_printed == false {
+                if run_length > 1 {
+                    content.push_str(&format!("{}", run_length));
+                }
+                content.push_str(dead_cell);
+            }
+        }
+
+        first_row = false;
+    }
+
+    content.push_str("!");
+
+    Ok(())
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -674,6 +762,116 @@ mod tests {
                     }
                 }
             }
+        }
+    }
+
+    mod save {
+        use super::*;
+
+        #[test]
+        fn empty_field() {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            let mut content = String::new();
+
+            let result = save(&field, &mut content);
+
+            assert!(if let Ok(()) = result {true} else {false});
+            assert_eq!("x = 0, y = 0\r\n".to_string(), content);
+        }
+
+        #[test]
+        fn all_dead() {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            let mut content = String::new();
+
+            for row in 0..5 {
+                field.push(Vec::new());
+
+                for cell in 0..4 {
+                    field[row].push(false);
+                }
+            }
+
+            let result = save(&field, &mut content);
+
+            assert!(if let Ok(()) = result {true} else {false});
+            assert_eq!("x = 5, y = 4\r\n\
+                        5b$\r\n5b$\r\n5b$\r\n5b!".to_string(), content);
+        }
+
+        #[test]
+        fn one_alive_in_the_first_cell() {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            let mut content = String::new();
+
+            for row in 0..5 {
+                field.push(Vec::new());
+
+                for cell in 0..4 {
+                    field[row].push(false);
+                }
+            }
+            field[0][0] = true;
+
+            let result = save(&field, &mut content);
+
+            assert!(if let Ok(()) = result {true} else {false});
+            assert_eq!("x = 5, y = 4\r\n\
+                        o$\r\n\
+                        5b$\r\n\
+                        5b$\r\n\
+                        5b!".to_string(), content);
+        }
+
+        #[test]
+        fn one_alive_in_the_last_cell() {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            let mut content = String::new();
+
+            for row in 0..5 {
+                field.push(Vec::new());
+
+                for cell in 0..4 {
+                    field[row].push(false);
+                }
+            }
+            field[4][3] = true;
+
+            let result = save(&field, &mut content);
+
+            assert!(if let Ok(()) = result {true} else {false});
+            assert_eq!("x = 5, y = 4\r\n\
+                        5b$\r\n\
+                        5b$\r\n\
+                        5b$\r\n\
+                        4bo!".to_string(), content);
+        }
+
+        #[test]
+        fn glider() {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            let mut content = String::new();
+
+            for row in 0..5 {
+                field.push(Vec::new());
+
+                for cell in 0..4 {
+                    field[row].push(false);
+                }
+            }
+            field[1][0] = true;
+            field[2][1] = true;
+            field[0][2] = true; field[1][2] = true; field[2][2] = true;
+
+
+            let result = save(&field, &mut content);
+
+            assert!(if let Ok(()) = result {true} else {false});
+            assert_eq!("x = 5, y = 4\r\n\
+                        bo$\r\n\
+                        2bo$\r\n\
+                        3o$\r\n\
+                        5b!".to_string(), content);
         }
     }
 }
