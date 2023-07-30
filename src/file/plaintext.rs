@@ -98,6 +98,26 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
     Ok(())
 }
 
+/// Saves content of the field to the given string
+
+pub fn save(field : & Vec<Vec<bool>>, content : &mut String) -> Result<(), ErrorCode>
+{
+    content.clear();
+
+    for row in field {
+        for cell in row {
+            if *cell == true {
+                content.push_str("O");
+            } else {
+                content.push_str(".");
+            }
+        }
+        content.push_str("\r\n");
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -296,6 +316,48 @@ mod tests {
             assert_eq!(false, field[2][0]); assert_eq!(false, field[2][1]); assert_eq!(true,  field[2][2]);
             assert_eq!(false, field[3][0]); assert_eq!(false, field[3][1]); assert_eq!(false,  field[3][2]);
         }
+    }
 
+    mod save {
+        use super::*;
+
+        #[test]
+        fn empty_field() {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            let mut content = String::new();
+
+            let result = save(&field, &mut content);
+
+            assert!(if let Ok(()) = result {true} else {false});
+            assert_eq!("".to_string(), content);
+        }
+
+        #[test]
+        fn one_row() {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            let mut content = String::new();
+
+            field.push(Vec::new());
+            //field[0].push(false);
+            //field[0].push(true);
+            //field[0].push(false);
+            //field[0].push(true);
+            //field[0].push(false);
+            for row in &field {
+                //*row.push(false);
+                //for cell in 0..5 {
+                //    if cell % 2 == 0 {
+                //        row.push(false);
+                //    } else {
+                //        row.push(true);
+                //    }
+                //}
+            }
+
+            let result = save(&field, &mut content);
+
+            assert!(if let Ok(()) = result {true} else {false});
+            assert_eq!(".O.O.\r\n".to_string(), content);
+        }
     }
 }

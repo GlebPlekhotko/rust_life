@@ -76,6 +76,11 @@ pub fn load(population : &mut Vec<Vec<bool>>, path : &String) -> Result<(), Erro
     }
 }
 
+pub fn save(population : &Vec<Vec<bool>>, path : &String) -> Result<(), ErrorCode>
+{
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
