@@ -1,5 +1,5 @@
 mod plaintext;
-pub mod rle;
+mod rle;
 
 use crate::errors::ErrorCode;
 use std::fs::File;
@@ -13,7 +13,7 @@ enum Formats {
 }
 
 
-/// Returns a tuple containing dimensiont of the filed in the given file
+/// Returns a tuple containing dimensions of the filed in the given file
 
 pub fn dimensions(path : &String) -> Result<(usize, usize), ErrorCode>
 {
@@ -56,9 +56,24 @@ fn deduce(path : &String) -> Formats {
 
 /// Attempts to load (setup) the population using the given file
 
-pub fn load(path : String, population : Vec<Vec<bool>>) -> Result<i32, ErrorCode>
+pub fn load(population : &mut Vec<Vec<bool>>, path : &String) -> Result<(), ErrorCode>
 {
-    Result::Ok(0)
+    match File::open(&path) {
+        Ok(mut file) => {
+            let mut content = String::new();
+
+            if let Err(_) = file.read_to_string(&mut content) {
+                return Err(ErrorCode::FailedToReadFile)
+            }
+        
+            match deduce(path) {
+                Formats::PlainText => plaintext::load(population, &content),
+                Formats::Rle => rle::load(population, &content),
+                _ => return Err(ErrorCode::UnrecognizedFileFormat)
+            }
+        },
+        Err(_) => Err(ErrorCode::FailedToOpenFile)
+    }
 }
 
 #[cfg(test)]

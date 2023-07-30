@@ -42,7 +42,7 @@ fn plaintext_five_by_four() {
 }
 
 #[test]
-fn rle_three_by_three() {
+fn rle_five_by_four() {
     let file_path = "tests/file_tests/run_length_encoded.rle".to_string();
     let x : usize;
     let y : usize;
@@ -51,6 +51,6 @@ fn rle_three_by_three() {
 
     (x, y) = result.unwrap();
 
-    assert_eq!(3, x);
-    assert_eq!(3, y);
+    assert_eq!(5, x);
+    assert_eq!(4, y);
 }

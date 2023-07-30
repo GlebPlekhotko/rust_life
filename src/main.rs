@@ -9,31 +9,31 @@ use life::field::FenceType::*;
 use std::env;
 
 fn main() {
-    let content = "x = 10, y = 2\n\
-                   10o!".to_string();
-    let mut field : Vec<Vec<bool>> = Vec::new();
+    //let content = "x = 10, y = 2\n\
+    //               10o!".to_string();
+    //let mut field : Vec<Vec<bool>> = Vec::new();
     
-    for row in 0..10 {
-        field.push(Vec::new());
-        for cell in 0..2 {
-            field[row].push(false);
-        }
-    }
+    //for row in 0..10 {
+    //    field.push(Vec::new());
+    //    for cell in 0..2 {
+    //        field[row].push(false);
+    //    }
+    //}
 
-    let result = file::rle::load(&mut field, &content);
+    //let result = file::rle::load(&mut field, &content);
 
-    for y in 0..field[0].len() {
-        for x in 0..field.len() {
-            print!("{} ", field[x][y]);
-        }
-        println!("");
-    }
+    //for y in 0..field[0].len() {
+    //    for x in 0..field.len() {
+    //        print!("{} ", field[x][y]);
+    //    }
+    //    println!("");
+    //}
 
-     if let Ok(()) = result {
-        println!("Result ok");
-    } else {
-        println!("Result not ok {:?}", result);
-    }
+    // if let Ok(()) = result {
+    //    println!("Result ok");
+    //} else {
+    //    println!("Result not ok {:?}", result);
+    //}
 
 
     //let console = display::Display::create(display::Id::CONSOLE, 6, 6);
