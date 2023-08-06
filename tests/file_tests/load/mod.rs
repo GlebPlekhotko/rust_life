@@ -1,3 +1,6 @@
+mod plaintext;
+mod rle;
+
 use life::errors::ErrorCode;
 use life::file::*;
 

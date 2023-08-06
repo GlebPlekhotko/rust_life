@@ -1,4 +1,4 @@
-mod plaintext;
+pub mod plaintext;
 pub mod rle;
 
 use crate::errors::ErrorCode;

@@ -9,20 +9,20 @@ use life::field::FenceType::*;
 use std::env;
 
 fn main() {
-    let mut field : Vec<Vec<bool>> = Vec::new();
-    let mut content = String::new();
+    //let mut field : Vec<Vec<bool>> = Vec::new();
+    //let mut content = String::new();
 
-    for row in 0..5 {
-        field.push(Vec::new());
+    //for row in 0..5 {
+    //    field.push(Vec::new());
 
-        for cell in 0..4 {
-            field[row].push(false);
-        }
-    }
-    field[0][0] = true;
-    field[4][3] = true;
+    //    for cell in 0..4 {
+    //        field[row].push(false);
+    //    }
+    //}
+    //field[0][0] = true;
+    //field[4][3] = true;
 
-    let result = file::rle::save(&field, &mut content);
+    //let result = file::rle::save(&field, &mut content);
 
     //for y in 0..field[0].len() {
     //    for x in 0..field.len() {
