@@ -5,6 +5,7 @@ use crate::errors::ErrorCode;
 use std::fs::File;
 use std::io;
 use std::io::Read;
+use std::io::Write;
 
 enum Formats {
     PlainText,
@@ -76,8 +77,28 @@ pub fn load(population : &mut Vec<Vec<bool>>, path : &String) -> Result<(), Erro
     }
 }
 
+/// Saves the given population to the destination file
+
 pub fn save(population : &Vec<Vec<bool>>, path : &String) -> Result<(), ErrorCode>
 {
+    let mut content = String::new();
+    let format = deduce(path);
+
+    match deduce(path) {
+        Formats::PlainText => plaintext::save(population, &mut content),
+        Formats::Rle => rle::save(population, &mut content),
+        _ => return Err(ErrorCode::UnrecognizedFileFormat)
+    };
+
+    let mut file = match File::create(path) {
+        Ok(handle) => handle,
+        _ => return Err(ErrorCode::FailedToCreateFile),
+    };    
+
+    if let Err(_) = file.write(content.as_bytes()) {
+        return Err(ErrorCode::FailedToWriteFile);
+    }
+
     Ok(())
 }
 

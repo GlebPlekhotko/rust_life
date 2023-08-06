@@ -9,5 +9,7 @@ pub enum ErrorCode {
     FailedToReadFile,
     FieldTooSmall,
     RleVolationXSize,
-    RleVolationYSize
+    RleVolationYSize,
+    FailedToCreateFile,
+    FailedToWriteFile,
 }
