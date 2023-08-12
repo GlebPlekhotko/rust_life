@@ -1,11 +1,15 @@
+pub use crate::field::FenceType;
+
 #[derive(PartialEq)]
 pub struct Arguments {
-    pub x_size : u32,
-    pub y_size : u32,
+    pub x_size : usize,
+    pub y_size : usize,
 
     pub generations : u32,
     pub output_each_generation : bool,
     pub density : f32,
+
+    pub fence_type : FenceType,
 
     pub input_file : Option<String>,
     pub output_file : Option<String>
@@ -17,6 +21,7 @@ enum Switches {
     Generations,
     OutputEachGeneration,
     Density,
+    FenceType,
     InputFile,
     OutputFile
 }
@@ -31,6 +36,7 @@ pub fn parse(input : Vec<String>) -> Arguments {
         generations : 0,
         output_each_generation : false,
         density : 0.0,
+        fence_type : FenceType::Cliff,
         input_file : None,
         output_file : None
     };
@@ -58,13 +64,14 @@ pub fn parse(input : Vec<String>) -> Arguments {
             }
 
             match switch {
-                Switches::XSize => arguments.x_size = get_unsigned_integer(switch_str),
-                Switches::YSize => arguments.y_size = get_unsigned_integer(switch_str),
+                Switches::XSize => arguments.x_size = get_usize(switch_str),
+                Switches::YSize => arguments.y_size = get_usize(switch_str),
                 Switches::Generations => arguments.generations = get_unsigned_integer(switch_str),
                 Switches::OutputEachGeneration => arguments.output_each_generation = true,
                 Switches::Density => arguments.density = get_float(switch_str),
                 Switches::InputFile => arguments.input_file = get_string(switch_str),
-                Switches::OutputFile => arguments.output_file = get_string(switch_str)
+                Switches::OutputFile => arguments.output_file = get_string(switch_str),
+                Switches::FenceType => arguments.fence_type = get_fence(switch_str)
             }
 
             switch_expected = true;
@@ -96,6 +103,7 @@ fn fetch_switch(switch_str : &String) -> Option<Switches> {
                     'd' => switch = Some(Switches::Density),
                     'i' => switch = Some(Switches::InputFile),
                     'o' => switch = Some(Switches::OutputFile),
+                    'f' => switch = Some(Switches::FenceType),
                     _ => ()
                 }
             }
@@ -132,11 +140,31 @@ fn get_unsigned_integer(value_str : &String) -> u32 {
 
 /// Tries to convert given string to an unsigned integer
 
+fn get_usize(value_str : &String) -> usize {
+    match value_str.trim().parse() {
+        Ok(value) => value,
+        Err(_) => panic!("Wrong switch value\n")
+    }
+}
+
+/// Just extracts and returns the substring
+
 fn get_string(value_str : &String) -> Option<String> {
     if value_str.len() > 0 {
         Some(String::from(value_str))
     } else {
         None
+    }
+}
+
+/// Tries to convert given string to the one of the known fence types
+
+fn get_fence(value_str : &String) -> FenceType {
+    match value_str.trim() {
+        "cliff" => FenceType::Cliff,
+        "fade" => FenceType::FadeAway,
+        "warp" => FenceType::Warp,
+        _ => panic!("Wrong switch value\n")
     }
 }
 

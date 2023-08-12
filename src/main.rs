@@ -1,14 +1,21 @@
-mod display;
 mod arguments;
-mod input;
-mod file;
+mod display;
 mod errors;
+mod field;
+mod file;
+mod input;
 
-use life::field;
-use life::field::FenceType::*;
 use std::env;
 
 fn main() {
+    let arg_strings: Vec<String> = env::args().collect();   
+    let mut args = arguments::parse(arg_strings);
+
+    if let Some(_) = args.input_file {
+        //(args.x_size, args.y_size) = file::dimensions(&args.input_file.unwrap()).unwrap();
+    }
+
+
     //let mut field : Vec<Vec<bool>> = Vec::new();
     //let mut content = String::new();
 

@@ -11,6 +11,8 @@ fn empty_arguments_string() {
         output_each_generation : false,
         density : 0.0,
 
+        fence_type : FenceType::Cliff,
+
         input_file : None,
         output_file : None
     };
@@ -30,6 +32,8 @@ fn one_argument_string() {
         generations : 0,
         output_each_generation : false,
         density : 0.0,
+
+        fence_type : FenceType::Cliff,
 
         input_file : None,
         output_file : None
@@ -52,6 +56,8 @@ fn x_size() {
         generations : 0,
         output_each_generation : false,
         density : 0.0,
+
+        fence_type : FenceType::Cliff,
 
         input_file : None,
         output_file : None
@@ -89,6 +95,8 @@ fn y_size() {
         output_each_generation : false,
         density : 0.0,
 
+        fence_type : FenceType::Cliff,
+
         input_file : None,
         output_file : None
     };
@@ -124,6 +132,8 @@ fn generations() {
         generations : 100,
         output_each_generation : false,
         density : 0.0,
+
+        fence_type : FenceType::Cliff,
 
         input_file : None,
         output_file : None
@@ -161,6 +171,8 @@ fn output_each_generation() {
         output_each_generation : true,
         density : 0.0,
 
+        fence_type : FenceType::Cliff,
+
         input_file : None,
         output_file : None
     };
@@ -183,6 +195,8 @@ fn density() {
         generations : 0,
         output_each_generation : false,
         density : 0.5,
+
+        fence_type : FenceType::Cliff,
 
         input_file : None,
         output_file : None
@@ -209,6 +223,8 @@ fn density_illegal_value_type() {
         output_each_generation : false,
         density : 0.5,
 
+        fence_type : FenceType::Cliff,
+
         input_file : None,
         output_file : None
     };
@@ -232,6 +248,8 @@ fn input_file() {
         generations : 0,
         output_each_generation : false,
         density : 0.0,
+
+        fence_type : FenceType::Cliff,
 
         input_file : Some("input_file".to_string()),
         output_file : None
@@ -257,6 +275,8 @@ fn input_file_empty_string() {
         output_each_generation : false,
         density : 0.0,
 
+        fence_type : FenceType::Cliff,
+
         input_file : None,
         output_file : None
     };
@@ -280,6 +300,8 @@ fn output_file() {
         generations : 0,
         output_each_generation : false,
         density : 0.0,
+
+        fence_type : FenceType::Cliff,
 
         input_file : None,
         output_file : Some("output_file".to_string()),
@@ -305,6 +327,8 @@ fn output_file_empty_string() {
         output_each_generation : false,
         density : 0.0,
 
+        fence_type : FenceType::Cliff,
+
         input_file : None,
         output_file : None
     };
@@ -312,6 +336,84 @@ fn output_file_empty_string() {
     input.push(String::from("input"));
     input.push(String::from("-o"));
     input.push(String::from(""));
+
+    let actual = parse(input);
+
+    assert!(expected == actual);
+}
+
+#[test]
+fn fence_type_cliff() {
+    let mut input : Vec<String> = Vec::new();
+    let expected = Arguments {
+        x_size : 0,
+        y_size : 0,
+
+        generations : 0,
+        output_each_generation : false,
+        density : 0.0,
+
+        fence_type : FenceType::Cliff,
+
+        input_file : None,
+        output_file : None,
+    };
+
+    input.push(String::from("input"));
+    input.push(String::from("-f"));
+    input.push(String::from("cliff"));
+
+    let actual = parse(input);
+
+    assert!(expected == actual);
+}
+
+#[test]
+fn fence_type_fade_away() {
+    let mut input : Vec<String> = Vec::new();
+    let expected = Arguments {
+        x_size : 0,
+        y_size : 0,
+
+        generations : 0,
+        output_each_generation : false,
+        density : 0.0,
+
+        fence_type : FenceType::FadeAway,
+
+        input_file : None,
+        output_file : None,
+    };
+
+    input.push(String::from("input"));
+    input.push(String::from("-f"));
+    input.push(String::from("fade"));
+
+    let actual = parse(input);
+
+    assert!(expected == actual);
+}
+
+#[test]
+fn fence_type_warp() {
+    let mut input : Vec<String> = Vec::new();
+    let expected = Arguments {
+        x_size : 0,
+        y_size : 0,
+
+        generations : 0,
+        output_each_generation : false,
+        density : 0.0,
+
+        fence_type : FenceType::Warp,
+
+        input_file : None,
+        output_file : None,
+    };
+
+    input.push(String::from("input"));
+    input.push(String::from("-f"));
+    input.push(String::from("warp"));
 
     let actual = parse(input);
 
@@ -328,6 +430,8 @@ fn multiple_arguments() {
         generations : 10,
         output_each_generation : true,
         density : 0.5,
+
+        fence_type : FenceType::FadeAway,
 
         input_file : Some("input_file".to_string()),
         output_file : Some("output_file".to_string())
@@ -347,6 +451,8 @@ fn multiple_arguments() {
     input.push(String::from("input_file"));
     input.push(String::from("-o"));
     input.push(String::from("output_file"));
+    input.push(String::from("-f"));
+    input.push(String::from("fade"));
 
     let actual = parse(input);
 
@@ -364,11 +470,15 @@ fn multiple_arguments_reverse() {
         output_each_generation : true,
         density : 0.5,
 
+        fence_type : FenceType::FadeAway,
+
         input_file : Some("input_file".to_string()),
         output_file : Some("output_file".to_string())
     };
 
     input.push(String::from("input"));
+    input.push(String::from("-f"));
+    input.push(String::from("fade"));
     input.push(String::from("-o"));
     input.push(String::from("output_file"));
     input.push(String::from("-i"));
@@ -399,6 +509,8 @@ fn no_arguments_value() {
         generations : 0,
         output_each_generation : false,
         density : 0.0,
+
+        fence_type : FenceType::Cliff,
 
         input_file : None,
         output_file : None
