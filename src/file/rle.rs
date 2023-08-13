@@ -49,6 +49,8 @@ pub fn dimensions(content : &String) -> Result<(usize, usize), ErrorCode>
                                                 None => return Err(ErrorCode::WrongRleHeader)
                                             }
                                         }
+
+                                        header_expected = false;
                                     }
                                     _ => return Err(ErrorCode::WrongRleHeader)
                                 }
@@ -102,7 +104,7 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
                         run_length = 1;
                     }
 
-                    for cell in 0..run_length {
+                    for _cell in 0..run_length {
                         field[x][y] = false;
                         x += 1;
                     }
@@ -119,7 +121,7 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
                         run_length = 1;
                     }
 
-                    for cell in 0..run_length {
+                    for _cell in 0..run_length {
                         field[x][y] = true;
                         x += 1;
                     }
@@ -134,7 +136,7 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
                     }
 
                     if x != x_field {                       
-                        for cell in 0..(x_field - x) {
+                        for _cell in 0..(x_field - x) {
                             field[x][y] = false;
                         }
                     }
@@ -151,11 +153,10 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
                         if y == y_field - 1 {
                             break 'line_loop;
                         } else {
-                            x = 0;
                             y += 1;
                         }
                     } else {
-                        for cell in 0..(x_field - x) {
+                        for _cell in 0..(x_field - x) {
                             field[x][y] = false;
                             x += 1;
                         }
@@ -196,8 +197,8 @@ pub fn save(field : & Vec<Vec<bool>>, content : &mut String) -> Result<(), Error
     let dead_cell = "b";
     let x_size : usize;
     let y_size : usize;
-    let mut cell_char : &str = alive_cell;
-    let mut run_length = 0;
+    let mut cell_char;
+    let mut run_length;
 
     x_size = field.len();
     if x_size > 0 {
@@ -213,12 +214,8 @@ pub fn save(field : & Vec<Vec<bool>>, content : &mut String) -> Result<(), Error
         return Ok(());
     }    
 
-
-    let mut first_row = true;
-
     for y in 0..y_size {
         let mut smth_printed = false;
-        let mut new_row = true;
         let mut previous_cell = false;
 
         run_length = 0;
@@ -266,8 +263,6 @@ pub fn save(field : & Vec<Vec<bool>>, content : &mut String) -> Result<(), Error
                 content.push_str(dead_cell);
             }
         }
-
-        first_row = false;
     }
 
     content.push_str("!");

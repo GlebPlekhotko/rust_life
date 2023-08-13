@@ -3,7 +3,6 @@ pub mod rle;
 
 use crate::errors::ErrorCode;
 use std::fs::File;
-use std::io;
 use std::io::Read;
 use std::io::Write;
 
@@ -82,13 +81,12 @@ pub fn load(population : &mut Vec<Vec<bool>>, path : &String) -> Result<(), Erro
 pub fn save(population : &Vec<Vec<bool>>, path : &String) -> Result<(), ErrorCode>
 {
     let mut content = String::new();
-    let format = deduce(path);
 
     match deduce(path) {
         Formats::PlainText => plaintext::save(population, &mut content),
         Formats::Rle => rle::save(population, &mut content),
-        _ => return Err(ErrorCode::UnrecognizedFileFormat)
-    };
+        _ => Err(ErrorCode::UnrecognizedFileFormat)
+    }?;
 
     let mut file = match File::create(path) {
         Ok(handle) => handle,

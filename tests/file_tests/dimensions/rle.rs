@@ -95,6 +95,19 @@ fn wrong_x_and_y_separator() {
 }
 
 #[test]
+fn unexpected_header() {
+    let content = "x = 1, y = 1\n\
+                   #".to_string();
+
+    let dimensions = dimensions(&content);
+
+    match dimensions {
+        Ok(_) => assert!(true),
+        Err(_) => assert!(false)
+    }
+}
+
+#[test]
 fn two_by_two() {
     let content = "#\n\
                    x = 2, y = 2".to_string();

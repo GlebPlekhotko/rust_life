@@ -46,8 +46,9 @@ pub struct Field {
 }
 
 
-/// This is a helpef function, which compares public areas of the two fields
+/// This is a helper function, which compares public areas of the two fields
 
+#[allow(dead_code)]
 pub fn equal(first : &Field, second : &Field) -> bool {
     let mut are_equal = true;
     

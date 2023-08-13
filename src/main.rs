@@ -12,7 +12,6 @@ use std::env;
 fn main() {
     let arg_strings: Vec<String> = env::args().collect();   
     let mut args = arguments::parse(arg_strings);
-    let mut load_file = false;
 
     match args.input_file {
         Some(ref file) => {
@@ -31,14 +30,13 @@ fn main() {
         }
     }
 
-    let display = Display::create(display::Id::CONSOLE, args.x_size, args.y_size);
+    let display = Display::create(args.x_size, args.y_size);
     let mut field = Field::create(args.x_size, args.y_size, args.fence_type);
 
     match args.input_file {
         Some(ref file) => {
-            match file::load(&mut field.population, &file) {
-                Ok(()) => (),
-                Err(error) => println!("Error: Failed to obtain dimensions from the file, code {}", error as i32)
+            if let Err(error) = file::load(&mut field.population, &file) {
+                println!("Error: Failed to load, code {}", error as i32)
             }
         },
         None => {
@@ -53,7 +51,10 @@ fn main() {
             match args.output_file {
                 Some(ref file) => {
                     let generation_file = file.clone() + "_" + &generation.to_string();
-                    file::save(&field.population, &generation_file);
+
+                    if let Err(error) = file::save(&field.population, &generation_file) {
+                        println!("Error: Failed to save, code {}", error as i32)
+                    }
                 },
                 None => {
                     display.draw(&field.population);
@@ -64,7 +65,9 @@ fn main() {
         field.update(args.generations);
         match args.output_file {
             Some(ref file) => {
-                file::save(&field.population, file);
+                if let Err(error) = file::save(&field.population, file) {
+                    println!("Error: Failed to save, code {}", error as i32)
+                }
             },
             None => {
                 display.draw(&field.population);

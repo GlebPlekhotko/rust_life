@@ -1,22 +1,15 @@
-pub enum Id {
-    CONSOLE
-}
-
 struct Resolution {
     x : usize,
     y : usize
 }
 
 pub struct Display {
-    id : Id,
-
     resolution : Resolution    
 }
 
 impl Display {
-    pub fn create(id : Id, x_resolution : usize, y_resolution : usize) -> Self {
+    pub fn create(x_resolution : usize, y_resolution : usize) -> Self {
         Self {
-            id : id,
             resolution : Resolution {
                 x : x_resolution,
                 y : y_resolution
