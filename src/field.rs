@@ -42,7 +42,6 @@ pub struct Field {
 
     cell : Vec<Vec<Cell>>,
     
-    pub cells_total : u32,
     pub alive : u32,
 }
 
@@ -99,7 +98,7 @@ impl Field {
     
     /// Creates instance structure's instance
 
-    pub fn create(x_size : u32, y_size : u32, fence : FenceType) -> Self {
+    pub fn create(x_size : usize, y_size : usize, fence : FenceType) -> Self {
         if x_size == 0 || y_size == 0 {
             panic!("Field cannot be zero in size!");
         }
@@ -112,7 +111,6 @@ impl Field {
             
             cell : Vec::new(),
             
-            cells_total : x_size * y_size,
             alive : 0
         };
         

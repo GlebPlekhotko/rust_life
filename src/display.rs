@@ -3,8 +3,8 @@ pub enum Id {
 }
 
 struct Resolution {
-    x : u32,
-    y : u32
+    x : usize,
+    y : usize
 }
 
 pub struct Display {
@@ -14,7 +14,7 @@ pub struct Display {
 }
 
 impl Display {
-    pub fn create(id : Id, x_resolution : u32, y_resolution : u32) -> Self {
+    pub fn create(id : Id, x_resolution : usize, y_resolution : usize) -> Self {
         Self {
             id : id,
             resolution : Resolution {
@@ -25,11 +25,11 @@ impl Display {
     }
 
     pub fn draw(&self, field : &Vec<Vec<bool>>) {
-        if field.len() > self.resolution.x as usize {
+        if field.len() > self.resolution.x {
             panic!("Field's X dimension violates display size");
         } 
 
-        if field[0].len() != self.resolution.y as usize {
+        if field[0].len() != self.resolution.y {
             panic!("Field's Y dimension violates display size");
         }
 

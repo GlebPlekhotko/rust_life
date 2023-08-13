@@ -1,15 +1,16 @@
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub enum ErrorCode {
-    HeaderNotExpected,
-    UnrecognizedCharacter,
-    WrongRleHeader,
-    UnrecognizedFileFormat,
-    FailedToOpenFile,
-    FailedToReadFile,
-    FieldTooSmall,
-    RleVolationXSize,
-    RleVolationYSize,
-    FailedToCreateFile,
-    FailedToWriteFile,
+    HeaderNotExpected = -1,
+    UnrecognizedCharacter = -2,
+    WrongRleHeader = -3,
+    UnrecognizedFileFormat = -4,
+    FailedToOpenFile = -5,
+    FailedToReadFile = -6,
+    FieldTooSmall = -7,
+    RleVolationXSize = -8,
+    RleVolationYSize = -9,
+    FailedToCreateFile = -10,
+    FailedToWriteFile = -11,
+    BothFileAndDimensionsSpecified = -12
 }

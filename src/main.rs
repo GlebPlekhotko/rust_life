@@ -3,74 +3,72 @@ mod display;
 mod errors;
 mod field;
 mod file;
-mod input;
 
+use display::Display;
+use errors::ErrorCode;
+use field::Field;
 use std::env;
 
 fn main() {
     let arg_strings: Vec<String> = env::args().collect();   
     let mut args = arguments::parse(arg_strings);
+    let mut load_file = false;
 
-    if let Some(_) = args.input_file {
-        //(args.x_size, args.y_size) = file::dimensions(&args.input_file.unwrap()).unwrap();
+    match args.input_file {
+        Some(ref file) => {
+            if args.x_size != 0 || args.y_size != 0 {
+                println!("Error: Both dimensions and load file specified, code {}", ErrorCode::BothFileAndDimensionsSpecified as i32);
+                return;
+            }
+
+            match file::dimensions(&file) {
+                Ok(x_y) => (args.x_size, args.y_size) = x_y,
+                Err(error) => println!("Error: Failed to obtain dimensions from the file, code {}", error as i32)
+            }
+        },
+        None => {
+            ()
+        }
     }
 
+    let display = Display::create(display::Id::CONSOLE, args.x_size, args.y_size);
+    let mut field = Field::create(args.x_size, args.y_size, args.fence_type);
 
-    //let mut field : Vec<Vec<bool>> = Vec::new();
-    //let mut content = String::new();
+    match args.input_file {
+        Some(ref file) => {
+            match file::load(&mut field.population, &file) {
+                Ok(()) => (),
+                Err(error) => println!("Error: Failed to obtain dimensions from the file, code {}", error as i32)
+            }
+        },
+        None => {
+            field.populate_randomly(args.density);
+        }
+    }
 
-    //for row in 0..5 {
-    //    field.push(Vec::new());
+    if args.output_each_generation == true {
+        for generation in 0..args.generations {
+            field.update(1);
 
-    //    for cell in 0..4 {
-    //        field[row].push(false);
-    //    }
-    //}
-    //field[0][0] = true;
-    //field[4][3] = true;
-
-    //let result = file::rle::save(&field, &mut content);
-
-    //for y in 0..field[0].len() {
-    //    for x in 0..field.len() {
-    //        print!("{} ", field[x][y]);
-    //    }
-    //    println!("");
-    //}
-
-    // if let Ok(()) = result {
-    //    println!("Result ok");
-    //} else {
-    //    println!("Result not ok {:?}", result);
-    //}
-
-
-    //let console = display::Display::create(display::Id::CONSOLE, 6, 6);
-    //let mut glider = field::Field::create(6, 6, Warp);
-    //let mut expected = field::Field::create(6, 6, Warp);
-
-    //glider.population[3][4] = true;
-    //glider.population[4][5] = true;
-    //glider.population[5][3] = true;
-    //glider.population[5][4] = true;
-    //glider.population[5][5] = true;
-
-    //expected.population[0][1] = true;
-    //expected.population[1][2] = true;
-    //expected.population[2][0] = true;
-    //expected.population[2][1] = true;
-    //expected.population[2][2] = true; 
-
-    //console.draw(&glider.population);
-    
-    //glider.update(12);
-    
-    //console.draw(&glider.population);
-
-    //expected.population[4][3] = true;
-    //expected.population[4][5] = true;
-    //expected.population[5][4] = true;
-    //expected.population[5][4] = true;
-
-    //let args = arguments::parse(args_string);
+            match args.output_file {
+                Some(ref file) => {
+                    let generation_file = file.clone() + "_" + &generation.to_string();
+                    file::save(&field.population, &generation_file);
+                },
+                None => {
+                    display.draw(&field.population);
+                }
+            };
+        }
+    } else {
+        field.update(args.generations);
+        match args.output_file {
+            Some(ref file) => {
+                file::save(&field.population, file);
+            },
+            None => {
+                display.draw(&field.population);
+            }
+        };
+    }
 }
