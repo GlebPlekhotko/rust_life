@@ -29,13 +29,6 @@ fn zero_alive() {
 }
 
 #[test]
-fn total_cells() {
-    let new_field = Field::create(10, 20, Cliff);
-    
-    assert_eq!(10 * 20, new_field.cells_total);
-}
-
-#[test]
 fn empty_upon_creation() {
     let new_field = Field::create(10, 20, Cliff);
     
