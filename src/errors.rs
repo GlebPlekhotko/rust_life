@@ -12,5 +12,6 @@ pub enum ErrorCode {
     RleVolationYSize = -9,
     FailedToCreateFile = -10,
     FailedToWriteFile = -11,
-    BothFileAndDimensionsSpecified = -12
+    BothFileAndDimensionsSpecified = -12,
+    NewlineFailed = -13
 }
