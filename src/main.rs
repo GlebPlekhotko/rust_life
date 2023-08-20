@@ -10,8 +10,14 @@ use field::Field;
 use std::env;
 
 fn main() {
-    let arg_strings: Vec<String> = env::args().collect();   
-    let mut args = arguments::parse(arg_strings);
+    let arg_string: Vec<String> = env::args().collect();
+
+    if arg_string.len() <= 1 {
+        arguments::help();
+        return;
+    }
+
+    let mut args = arguments::parse(arg_string);
 
     match args.input_file {
         Some(ref file) => {

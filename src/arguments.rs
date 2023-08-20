@@ -26,7 +26,6 @@ enum Switches {
     OutputFile
 }
 
-
 // Parse the command line arguments and populate structure with values
 
 pub fn parse(input : Vec<String>) -> Arguments {
@@ -166,6 +165,32 @@ fn get_fence(value_str : &String) -> FenceType {
         "warp" => FenceType::Warp,
         _ => panic!("Wrong switch value\n")
     }
+}
+
+/// A short instruction about the supported options
+
+pub fn help() {
+    println!("The following switched are currently supported:");
+    println!("  -x <int>   specifies the width of the field;");
+    println!("  -y <int>   specifies the height of the field;");
+    println!("  -g <int>   tells how many generations (iterations) to change");
+    println!("  -e         if passed, then each generation to be written to the screen or file");
+    println!("  -d <flt>   randomly populates the field with a given density (0 to 1.0)");
+    println!("  -f <opt>   specifies which fence type to choose for a field, that determines");
+    println!("             the behavior of the patterns near the edge of the field, the");
+    println!("             following options are avaiable:");
+    println!("               <cliff> - space beyond the field is considered to be dead, that");
+    println!("                         distors dynamic patterns like the glider near the edge;");
+    println!("               <fade>  - there is a certain invisible cells outside of the field,");
+    println!("                         which help the dynamic patterns silently vanish without");
+    println!("                         the distortions");
+    println!("               <warp>  - moving patterns return from the oposite side;");
+    println!("  -i <name>  specifies the name of the file to load the field from, two formats");
+    println!("             are supported:");
+    println!("               .cells - text file format where each character denotes a cell;");
+    println!("               .rle   - run length encoded file;");
+    println!("  -o <name>  specifies the name of the ouput file, format is guessed by the");
+    println!("             extension, supported files are the same as for input;");
 }
 
 /// Returns true if a given switch must be followed by a value
