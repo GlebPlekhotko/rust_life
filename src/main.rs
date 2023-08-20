@@ -65,7 +65,7 @@ fn main() {
 
             match args.output_file {
                 Some(ref file) => {
-                    let generation_file = file.clone() + "_" + &generation.to_string();
+                    let generation_file = (generation + 1).to_string() + "_" + &file.clone();
 
                     if let Err(error) = file::save(&field.population, &generation_file) {
                         println!("Error: Failed to save, code {}", 
