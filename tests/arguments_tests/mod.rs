@@ -4,12 +4,14 @@ use life::arguments::*;
 fn empty_arguments_string() {
     let input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -23,15 +25,44 @@ fn empty_arguments_string() {
 }
 
 #[test]
+fn help() {
+    let mut input : Vec<String> = Vec::new();
+    let expected = Arguments {
+        help : true,
+
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
+        output_each_generation : false,
+        density : 0.5,
+
+        fence_type : FenceType::Cliff,
+
+        input_file : None,
+        output_file : None
+    };
+
+    input.push(String::from("input"));
+    input.push(String::from("-h"));
+
+    let actual = parse(input);
+
+    assert!(expected == actual);
+}
+
+#[test]
 fn one_argument_string() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -50,12 +81,14 @@ fn one_argument_string() {
 fn x_size() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 100,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 100,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -88,12 +121,14 @@ fn x_size_illegal_value_type() {
 fn y_size() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
+        help : false,
+
+        x_size : 10,
         y_size : 100,
 
-        generations : 0,
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -126,12 +161,14 @@ fn y_size_illegal_value_type() {
 fn generations() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
+
+        x_size : 10,
+        y_size : 10,
 
         generations : 100,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -164,12 +201,14 @@ fn generations_illegal_value_type() {
 fn output_each_generation() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : true,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -189,10 +228,12 @@ fn output_each_generation() {
 fn density() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
         density : 0.5,
 
@@ -216,10 +257,12 @@ fn density() {
 fn density_illegal_value_type() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
         density : 0.5,
 
@@ -242,12 +285,14 @@ fn density_illegal_value_type() {
 fn input_file() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -268,12 +313,14 @@ fn input_file() {
 fn input_file_empty_string() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -294,12 +341,14 @@ fn input_file_empty_string() {
 fn output_file() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -320,12 +369,14 @@ fn output_file() {
 fn output_file_empty_string() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -346,12 +397,14 @@ fn output_file_empty_string() {
 fn fence_type_cliff() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 
@@ -372,12 +425,14 @@ fn fence_type_cliff() {
 fn fence_type_fade_away() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::FadeAway,
 
@@ -398,12 +453,14 @@ fn fence_type_fade_away() {
 fn fence_type_warp() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Warp,
 
@@ -424,6 +481,8 @@ fn fence_type_warp() {
 fn multiple_arguments() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
+        help : true,
+
         x_size : 200,
         y_size : 100,
 
@@ -438,6 +497,7 @@ fn multiple_arguments() {
     };
 
     input.push(String::from("input"));
+    input.push(String::from("-h"));
     input.push(String::from("-x"));
     input.push(String::from("200"));
     input.push(String::from("-y"));
@@ -463,6 +523,8 @@ fn multiple_arguments() {
 fn multiple_arguments_reverse() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
+        help : true,
+
         x_size : 200,
         y_size : 100,
 
@@ -492,6 +554,7 @@ fn multiple_arguments_reverse() {
     input.push(String::from("100"));
     input.push(String::from("-x"));
     input.push(String::from("200"));
+    input.push(String::from("-h"));
 
     let actual = parse(input);
 
@@ -503,12 +566,14 @@ fn multiple_arguments_reverse() {
 fn no_arguments_value() {
     let mut input : Vec<String> = Vec::new();
     let expected = Arguments {
-        x_size : 0,
-        y_size : 0,
+        help : false,
 
-        generations : 0,
+        x_size : 10,
+        y_size : 10,
+
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
 
         fence_type : FenceType::Cliff,
 

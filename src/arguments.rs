@@ -2,6 +2,8 @@ pub use crate::field::FenceType;
 
 #[derive(PartialEq)]
 pub struct Arguments {
+    pub help : bool,
+
     pub x_size : usize,
     pub y_size : usize,
 
@@ -16,6 +18,7 @@ pub struct Arguments {
 }
 
 enum Switches {
+    Help,
     XSize,
     YSize,
     Generations,
@@ -30,11 +33,12 @@ enum Switches {
 
 pub fn parse(input : Vec<String>) -> Arguments {
     let mut arguments = Arguments {
-        x_size : 0,
-        y_size : 0,
-        generations : 0,
+        help : false,
+        x_size : 10,
+        y_size : 10,
+        generations : 1,
         output_each_generation : false,
-        density : 0.0,
+        density : 0.5,
         fence_type : FenceType::Cliff,
         input_file : None,
         output_file : None
@@ -63,6 +67,7 @@ pub fn parse(input : Vec<String>) -> Arguments {
             }
 
             match switch {
+                Switches::Help => arguments.help = true,
                 Switches::XSize => arguments.x_size = get_usize(switch_str),
                 Switches::YSize => arguments.y_size = get_usize(switch_str),
                 Switches::Generations => arguments.generations = get_unsigned_integer(switch_str),
@@ -95,6 +100,7 @@ fn fetch_switch(switch_str : &String) -> Option<Switches> {
         match switch_char.next() {
             Some(character) => {
                 match character {
+                    'h' => switch = Some(Switches::Help),
                     'x' => switch = Some(Switches::XSize),
                     'y' => switch = Some(Switches::YSize),
                     'g' => switch = Some(Switches::Generations),
@@ -171,11 +177,13 @@ fn get_fence(value_str : &String) -> FenceType {
 
 pub fn help() {
     println!("The following switched are currently supported:");
-    println!("  -x <int>   specifies the width of the field;");
-    println!("  -y <int>   specifies the height of the field;");
-    println!("  -g <int>   tells how many generations (iterations) to change");
+    println!("  -h         the current help message");
+    println!("  -x <int>   specifies the width of the field, the default is 10;");
+    println!("  -y <int>   specifies the height of the field, the default is 10;");
+    println!("  -g <int>   tells how many generations (iterations) to change, the default is 1");
     println!("  -e         if passed, then each generation to be written to the screen or file");
-    println!("  -d <flt>   randomly populates the field with a given density (0 to 1.0)");
+    println!("  -d <flt>   randomly populates the field with a given density (0 to 1.0), the");
+    println!("             default value is 0.5");
     println!("  -f <opt>   specifies which fence type to choose for a field, that determines");
     println!("             the behavior of the patterns near the edge of the field, the");
     println!("             following options are avaiable:");
@@ -197,6 +205,7 @@ pub fn help() {
 
 fn switch_needs_value(switch : &Switches) -> bool {
     match switch {
+        Switches::Help => false,
         Switches::OutputEachGeneration => false,
         _ => true
     }
