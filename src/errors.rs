@@ -13,5 +13,7 @@ pub enum ErrorCode {
     FailedToCreateFile = -10,
     FailedToWriteFile = -11,
     BothFileAndDimensionsSpecified = -12,
-    NewlineFailed = -13
+    NewlineFailed = -13,
+    NoFileExtension = -14,
+    EmptyPath = -15
 }

@@ -12,6 +12,59 @@ enum Formats {
     Unknown,
 }
 
+/// Appends a number to the and of the file path
+
+/**
+    Given function is useful in the cases when multiple consequetive generations to be saved to the distinct files. 
+    For instance, output_0.cells, output_1.cells, output_3.cells and so on.
+*/
+pub fn append_number(old_path : &String, number : u32) -> Result<String, ErrorCode> {
+    let mut new_path : String;
+    let path : &str;
+    let file : &str;
+    let name : &str;
+    let extension : &str;
+
+    if old_path == "" {
+        return Err(ErrorCode::EmptyPath);
+    }
+
+    match old_path.rsplit_once('/') {
+        Some((left, right)) => {
+            path = left;
+            file = right;
+        },
+        None => {
+            path = "";
+            file = old_path.as_str();
+        }
+    }
+
+    match file.rsplit_once('.') {
+        Some((left, right)) => {
+            name = left;
+            extension = right;
+            if extension == "" {
+                return Err(ErrorCode::NoFileExtension);    
+            }
+        },
+        None => {
+            return Err(ErrorCode::NoFileExtension);
+        }
+    }
+
+    new_path = String::from(path);
+    if new_path != "" {
+        new_path += "/";
+    }
+    new_path += name;
+    new_path += "_";
+    new_path += &number.to_string();
+    new_path += ".";
+    new_path += extension;
+
+    return Ok(new_path);
+}
 
 /// Returns a tuple containing dimensions of the filed in the given file
 
