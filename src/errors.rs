@@ -15,5 +15,6 @@ pub enum ErrorCode {
     NewlineFailed = -12,
     NoFileExtension = -13,
     EmptyPath = -14,
-    FailedToCreateDirectory = -15
+    FailedToCreateDirectory = -15,
+    CellsNotExpected = -16
 }

@@ -77,3 +77,33 @@ fn three_by_four() {
 
     assert_eq!((3, 4), dimensions.unwrap());
 }
+
+#[test]
+fn newline_in_the_middle() {
+    let content = "!First line\n\
+                   !\n\
+                   .O.\n\
+                   ..O\n\
+                   .O.\n\
+                   \n\
+                   O..\n".to_string();
+
+    let dimensions = dimensions(&content);
+
+    assert_eq!(ErrorCode::CellsNotExpected, dimensions.err().unwrap());
+}
+
+#[test]
+fn trailing_newlines_ignored() {
+    let content = "!First line\n\
+                   !\n\
+                   .O.\n\
+                   ..O\n\
+                   .O.\n\
+                   O..\n\
+                   \n".to_string();
+
+    let dimensions = dimensions(&content);
+
+    assert_eq!((3, 4), dimensions.unwrap());
+}

@@ -8,26 +8,35 @@ pub fn dimensions(content : &String) -> Result<(usize, usize), ErrorCode>
     let mut y : usize = 0;
     let mut header_expected = true;
     let mut x_obtained = false;
+    let mut empty_line_found = false;
 
     for line in content.lines() {
         match line.chars().next() {
             Some(first_char) => match first_char {
                                     '!' =>  {
                                         if header_expected == false {
-                                            return Err(ErrorCode::HeaderNotExpected)
+                                            return Err(ErrorCode::HeaderNotExpected);
                                         }
                                     },
                                     '.' | 'O' => {
+                                        if empty_line_found == true {
+                                            return Err(ErrorCode::CellsNotExpected);
+                                        }
+
                                         if x_obtained == false {
                                             x = line.len();
                                             x_obtained = true;
                                         }
                                         y = y + 1;
                                         header_expected = false;
+                                    },
+                                    _ => {
+                                        return Err(ErrorCode::UnrecognizedCharacter);
                                     }
-                                    _ => return Err(ErrorCode::UnrecognizedCharacter)
                                 }
-            _ => panic!("There is a line, but now characters in it\n")
+            _ => {
+                empty_line_found = true;
+            }
         }
     }
 
