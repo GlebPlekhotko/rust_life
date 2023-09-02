@@ -2,6 +2,7 @@ pub mod plaintext;
 pub mod rle;
 
 use crate::errors::ErrorCode;
+use std::fs;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
@@ -134,6 +135,12 @@ pub fn load(population : &mut Vec<Vec<bool>>, path : &String) -> Result<(), Erro
 pub fn save(population : &Vec<Vec<bool>>, path : &String) -> Result<(), ErrorCode>
 {
     let mut content = String::new();
+
+    if let Some((dir, _)) = path.rsplit_once("/") {
+        if let Err(_) = fs::create_dir_all(dir) {
+            return Err(ErrorCode::FailedToCreateDirectory);
+        }
+    }
 
     match deduce(path) {
         Formats::PlainText => plaintext::save(population, &mut content),

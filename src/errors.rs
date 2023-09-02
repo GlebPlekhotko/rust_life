@@ -14,5 +14,6 @@ pub enum ErrorCode {
     FailedToWriteFile = -11,
     NewlineFailed = -12,
     NoFileExtension = -13,
-    EmptyPath = -14
+    EmptyPath = -14,
+    FailedToCreateDirectory = -15
 }
