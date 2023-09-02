@@ -19,14 +19,17 @@ fn main() {
         return;
     }
 
+    if let Some(ref file) = args.input_file {
+        match file::dimensions(&file) {
+            Ok(x_y) => (args.x_size, args.y_size) = x_y,
+            Err(error) => println!("Error: Failed to obtain dimensions from the file, code {}", 
+                                   error as i32)
+        }
+    }
+
+    /*
     match args.input_file {
         Some(ref file) => {
-            if args.x_size != 0 || args.y_size != 0 {
-                println!("Error: Both dimensions and load file specified, code {}", 
-                         ErrorCode::BothFileAndDimensionsSpecified as i32);
-                return;
-            }
-
             match file::dimensions(&file) {
                 Ok(x_y) => (args.x_size, args.y_size) = x_y,
                 Err(error) => println!("Error: Failed to obtain dimensions from the file, code {}", 
@@ -37,6 +40,7 @@ fn main() {
             ()
         }
     }
+    */
 
     let display = Display::create(args.x_size, args.y_size);
     let mut field = Field::create(args.x_size, args.y_size, args.fence_type);
@@ -65,7 +69,14 @@ fn main() {
 
             match args.output_file {
                 Some(ref file) => {
-                    let generation_file = (generation + 1).to_string() + "_" + &file.clone();
+                    let generation_file = match file::append_number(file, generation + 1) {
+                        Ok(new_file) => new_file,
+                        Err(error) => {
+                            println!("Error: Failed to append generation number, code {}", 
+                                     error as i32);
+                            return;
+                        }
+                    };
 
                     if let Err(error) = file::save(&field.population, &generation_file) {
                         println!("Error: Failed to save, code {}", 
