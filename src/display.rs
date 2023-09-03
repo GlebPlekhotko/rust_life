@@ -44,7 +44,7 @@ impl Display {
             println!("|");
         }
 
-        for _botton_border in 0..field.len() + 2 {
+        for _bottom_border in 0..field.len() + 2 {
           print!("-");
         }
         println!("");

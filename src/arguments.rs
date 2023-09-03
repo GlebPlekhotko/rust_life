@@ -176,7 +176,7 @@ fn get_fence(value_str : &String) -> FenceType {
 /// A short instruction about the supported options
 
 pub fn help() {
-    println!("The following switched are currently supported:");
+    println!("The following switches are currently supported:");
     println!("  -h         the current help message");
     println!("  -x <int>   specifies the width of the field, the default is 10;");
     println!("  -y <int>   specifies the height of the field, the default is 10;");

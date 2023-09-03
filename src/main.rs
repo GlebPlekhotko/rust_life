@@ -10,6 +10,15 @@ use field::Field;
 use std::env;
 use std::io;
 
+
+/// A smaller wrapper to print the field to the standard output
+
+fn display_field(display : &Display, field : &Field, gen : u32) {
+    println!("Generation {}", gen);
+    display.draw(&field.population);
+    println!("");
+}
+
 fn main() {
     let arg_string: Vec<String> = env::args().collect();
     let mut args = arguments::parse(arg_string);
@@ -27,21 +36,6 @@ fn main() {
         }
     }
 
-    /*
-    match args.input_file {
-        Some(ref file) => {
-            match file::dimensions(&file) {
-                Ok(x_y) => (args.x_size, args.y_size) = x_y,
-                Err(error) => println!("Error: Failed to obtain dimensions from the file, code {}", 
-                                       error as i32)
-            }
-        },
-        None => {
-            ()
-        }
-    }
-    */
-
     let display = Display::create(args.x_size, args.y_size);
     let mut field = Field::create(args.x_size, args.y_size, args.fence_type);
 
@@ -58,9 +52,7 @@ fn main() {
     }
 
     if let None = args.output_file {
-        println!("Generation 0");
-        display.draw(&field.population);
-        println!("");
+        display_field(&display, &field, 0);
     }
 
     if args.output_each_generation == true {
@@ -84,9 +76,7 @@ fn main() {
                     }
                 },
                 None => {
-                    println!("Generation {}", generation + 1);
-                    display.draw(&field.population);
-                    println!("");
+                    display_field(&display, &field, generation + 1);
 
                     let mut _new_line = String::new();
                     if let io::Result::Err(_) = io::stdin().read_line(&mut _new_line) {
@@ -106,10 +96,8 @@ fn main() {
                 }
             },
             None => {
-                println!("Generation {}", args.generations);
-                display.draw(&field.population);
-                println!("");
+                display_field(&display, &field, args.generations);
             }
-        };
+        }
     }
 }
