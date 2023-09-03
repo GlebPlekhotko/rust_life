@@ -111,3 +111,27 @@ fn oversize_load() {
     assert_eq!(false, field[2][0]); assert_eq!(false, field[2][1]); assert_eq!(true,  field[2][2]);
     assert_eq!(false, field[3][0]); assert_eq!(false, field[3][1]); assert_eq!(false,  field[3][2]);
 }
+
+#[test]
+fn trailing_newlines() {
+    let content = "!\n\
+                   O..\n\
+                   .O.\n\
+                   ..O\n\
+                   \n".to_string();
+    let mut field : Vec<Vec<bool>> = Vec::new();
+    
+    field.push(Vec::new());
+    field.push(Vec::new());
+    field.push(Vec::new());
+    field[0].push(false); field[0].push(false); field[0].push(false);
+    field[1].push(false); field[1].push(false); field[1].push(false);
+    field[2].push(false); field[2].push(false); field[2].push(false);
+
+    let result = load(&mut field, &content);
+
+    assert!(if let Ok(()) = result {true} else {false});
+    assert_eq!(true, field[0][0]); assert_eq!(false, field[0][1]); assert_eq!(false, field[0][2]);
+    assert_eq!(false, field[1][0]); assert_eq!(true, field[1][1]); assert_eq!(false, field[1][2]);
+    assert_eq!(false, field[2][0]); assert_eq!(false, field[2][1]); assert_eq!(true, field[2][2]);
+}

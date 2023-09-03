@@ -61,6 +61,8 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
     let mut y : usize = 0;
 
     'line_loop: for line in content.lines() {
+        let mut empty_line = true;
+
         for character in line.chars() {
             match character {
                 '!' => {
@@ -71,10 +73,14 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
                     }
                 },
                 '.' => {
+                    empty_line = false;
+                    
                     header_passed = true;
-                    field[x][y] = false;
+                    field[x][y] = false;                    
                 },
                 'O' => {
+                    empty_line = false;
+
                     header_passed = true;
                     field[x][y] = true;
                 },
@@ -86,13 +92,15 @@ pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorC
             x += 1;
         }
 
-        while x < x_size {
-            field[x][y] = false;
-            x += 1;
-        }
+        if empty_line == false {
+            while x < x_size {
+                field[x][y] = false;
+                x += 1;
+            }
 
-        x = 0;
-        y += 1;
+            x = 0;
+            y += 1;
+        }
     }
 
     while y < y_size {
