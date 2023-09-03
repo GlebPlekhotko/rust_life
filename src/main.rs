@@ -4,7 +4,6 @@ mod errors;
 mod field;
 mod file;
 
-use display::Display;
 use errors::ErrorCode;
 use field::Field;
 use std::env;
@@ -13,9 +12,9 @@ use std::io;
 
 /// A smaller wrapper to print the field to the standard output
 
-fn display_field(display : &Display, field : &Field, gen : u32) {
+fn display_field(field : &Field, gen : u32) {
     println!("Generation {}", gen);
-    display.draw(&field.population);
+    display::draw(&field.population);
     println!("");
 }
 
@@ -36,7 +35,6 @@ fn main() {
         }
     }
 
-    let display = Display::create(args.x_size, args.y_size);
     let mut field = Field::create(args.x_size, args.y_size, args.fence_type);
 
     match args.input_file {
@@ -52,7 +50,7 @@ fn main() {
     }
 
     if let None = args.output_file {
-        display_field(&display, &field, 0);
+        display_field(&field, 0);
     }
 
     if args.output_each_generation == true {
@@ -76,7 +74,7 @@ fn main() {
                     }
                 },
                 None => {
-                    display_field(&display, &field, generation + 1);
+                    display_field(&field, generation + 1);
 
                     let mut _new_line = String::new();
                     if let io::Result::Err(_) = io::stdin().read_line(&mut _new_line) {
@@ -96,7 +94,7 @@ fn main() {
                 }
             },
             None => {
-                display_field(&display, &field, args.generations);
+                display_field(&field, args.generations);
             }
         }
     }

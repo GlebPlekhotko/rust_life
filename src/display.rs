@@ -1,52 +1,31 @@
-struct Resolution {
-    x : usize,
-    y : usize
-}
+/// The function used print out content of the field to the standard output
 
-pub struct Display {
-    resolution : Resolution    
-}
+/**
+    Nothing fancy inside. Just the two-dimensional array of "O" and " " characters depicting the alive and dead cells
+    respectively. And the primitive borders around. Note that the function has no information about the console's 
+    capacity, so the output may be easily distorted by the automatic line wraps.
+*/
+pub fn draw(field : &Vec<Vec<bool>>) {
+    println!("");
+    for _top_border in 0..field.len() + 2 {
+      print!("-");
+    }
+    println!("");
 
-impl Display {
-    pub fn create(x_resolution : usize, y_resolution : usize) -> Self {
-        Self {
-            resolution : Resolution {
-                x : x_resolution,
-                y : y_resolution
+    for row in 0..field[0].len() {
+        print!("|");
+        for column in field {
+            if (*column)[row] == true {
+                print!("O");
+            } else {
+                print!(" ");
             }
         }
+        println!("|");
     }
 
-    pub fn draw(&self, field : &Vec<Vec<bool>>) {
-        if field.len() > self.resolution.x {
-            panic!("Field's X dimension violates display size");
-        } 
-
-        if field[0].len() != self.resolution.y {
-            panic!("Field's Y dimension violates display size");
-        }
-
-        println!("");
-        for _top_border in 0..field.len() + 2 {
-          print!("-");
-        }
-        println!("");
-
-        for row in 0..field[0].len() {
-            print!("|");
-            for column in field {
-                if (*column)[row] == true {
-                    print!("O");
-                } else {
-                    print!(" ");
-                }
-            }
-            println!("|");
-        }
-
-        for _bottom_border in 0..field.len() + 2 {
-          print!("-");
-        }
-        println!("");
+    for _bottom_border in 0..field.len() + 2 {
+      print!("-");
     }
+    println!("");
 }
