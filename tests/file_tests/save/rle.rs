@@ -1,9 +1,8 @@
-use life::errors::ErrorCode;
 use life::file::rle::*;
 
 #[test]
 fn empty_field() {
-    let mut field : Vec<Vec<bool>> = Vec::new();
+    let field : Vec<Vec<bool>> = Vec::new();
     let mut content = String::new();
 
     let result = save(&field, &mut content);
@@ -20,7 +19,7 @@ fn all_dead() {
     for row in 0..5 {
         field.push(Vec::new());
 
-        for cell in 0..4 {
+        for _cell in 0..4 {
             field[row].push(false);
         }
     }
@@ -40,7 +39,7 @@ fn one_alive_in_the_first_cell() {
     for row in 0..5 {
         field.push(Vec::new());
 
-        for cell in 0..4 {
+        for _cell in 0..4 {
             field[row].push(false);
         }
     }
@@ -64,7 +63,7 @@ fn one_alive_in_the_last_cell() {
     for row in 0..5 {
         field.push(Vec::new());
 
-        for cell in 0..4 {
+        for _cell in 0..4 {
             field[row].push(false);
         }
     }
@@ -88,7 +87,7 @@ fn glider() {
     for row in 0..5 {
         field.push(Vec::new());
 
-        for cell in 0..4 {
+        for _cell in 0..4 {
             field[row].push(false);
         }
     }

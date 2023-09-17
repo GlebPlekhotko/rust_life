@@ -332,7 +332,7 @@ fn two_digits_run_just_first_line() {
     
     for x in 0..10 {
         field.push(Vec::new());
-        for y in 0..2 {
+        for _y in 0..2 {
             field[x].push(false);
         }
     }

@@ -41,7 +41,7 @@ fn plaintext_five_by_four() {
     let (x, y) = dimensions(&file_path).unwrap();
     for row in 0..x {
         field.push(Vec::new());
-        for column in 0..y {
+        for _column in 0..y {
             field[row].push(false);
         }
     }
@@ -63,7 +63,7 @@ fn rle_five_by_four() {
     let (x, y) = dimensions(&file_path).unwrap();
     for row in 0..x {
         field.push(Vec::new());
-        for column in 0..y {
+        for _column in 0..y {
             field[row].push(false);
         }
     }

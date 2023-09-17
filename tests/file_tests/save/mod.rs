@@ -1,7 +1,6 @@
 mod plaintext;
 mod rle;
 
-use std::fs::*;
 use life::errors::ErrorCode;
 use life::file::*;
 
@@ -25,12 +24,11 @@ fn plaintext_file() {
 
     let file_path = "tests/file_tests/test.cells".to_string();
     let mut field : Vec<Vec<bool>> = Vec::new();
-    let mut content = String::new();
 
     for row in 0..5 {
         field.push(Vec::new());
 
-        for cell in 0..4 {
+        for _cell in 0..4 {
             field[row].push(false);
         }
     }
@@ -47,7 +45,9 @@ fn plaintext_file() {
                 OOO..\r\n\
                 .....\r\n".to_string());
 
-    std::fs::remove_file(&file_path);
+    if let Err(_) = std::fs::remove_file(&file_path) {
+        panic!("Failed to delete a file while testing");
+    }
 }
 
 #[test]
@@ -56,12 +56,12 @@ fn plaintext_file_nested_dirs() {
     let file_path = "tests/file_tests/nested/test.cells".to_string();
     let dir_path = "tests/file_tests/nested/";
     let mut field : Vec<Vec<bool>> = Vec::new();
-    let mut content = String::new();
+
 
     for row in 0..5 {
         field.push(Vec::new());
 
-        for cell in 0..4 {
+        for _cell in 0..4 {
             field[row].push(false);
         }
     }
@@ -78,7 +78,9 @@ fn plaintext_file_nested_dirs() {
                 OOO..\r\n\
                 .....\r\n".to_string());
 
-    std::fs::remove_dir_all(&dir_path);
+    if let Err(_) = std::fs::remove_dir_all(&dir_path) {
+        panic!("Failed to remove a directory while testing");
+    }
 }
 
 #[test]
@@ -86,12 +88,11 @@ fn rle_file() {
 
     let file_path = "tests/file_tests/test.rle".to_string();
     let mut field : Vec<Vec<bool>> = Vec::new();
-    let mut content = String::new();
 
     for row in 0..5 {
         field.push(Vec::new());
 
-        for cell in 0..4 {
+        for _cell in 0..4 {
             field[row].push(false);
         }
     }
@@ -109,7 +110,9 @@ fn rle_file() {
                 3o$\r\n\
                 5b!".to_string(),);
 
-    std::fs::remove_file(&file_path);
+    if let Err(_) = std::fs::remove_file(&file_path) {
+        panic!("Failed to delete a file while testing");
+    }
 }
 
 #[test]
@@ -118,12 +121,11 @@ fn rle_file_nested_dirs() {
     let file_path = "tests/file_tests/nested/test.rle".to_string();
     let dir_path = "tests/file_tests/nested/";
     let mut field : Vec<Vec<bool>> = Vec::new();
-    let mut content = String::new();
 
     for row in 0..5 {
         field.push(Vec::new());
 
-        for cell in 0..4 {
+        for _cell in 0..4 {
             field[row].push(false);
         }
     }
@@ -141,5 +143,7 @@ fn rle_file_nested_dirs() {
                 3o$\r\n\
                 5b!".to_string(),);
 
-    std::fs::remove_dir_all(&dir_path);
+    if let Err(_) = std::fs::remove_dir_all(&dir_path) {
+        panic!("Failed to remove a directory while testing");
+    }
 }
