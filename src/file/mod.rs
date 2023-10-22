@@ -1,3 +1,4 @@
+pub mod gif;
 pub mod plaintext;
 pub mod rle;
 
@@ -10,6 +11,7 @@ use std::io::Write;
 enum Formats {
     PlainText,
     Rle,
+    Gif,
     Unknown,
 }
 
@@ -98,6 +100,7 @@ fn deduce(path : &String) -> Formats {
         format = match extension {
             "cells" => Formats::PlainText,
             "rle" => Formats::Rle,
+            "gif" => Formats::Gif,
             _ => Formats::Unknown
         };
 
@@ -190,6 +193,20 @@ mod tests {
         let format = deduce(&"dir1/dir2/test.rle".to_string());
 
         assert!(if let Formats::Rle = format { true } else { false });
+    }
+
+    #[test]
+    fn gif_simple_path() {
+        let format = deduce(&"test.gif".to_string());
+
+        assert!(if let Formats::Gif = format { true } else { false });
+    }
+
+    #[test]
+    fn gif_complex_path() {
+        let format = deduce(&"dir1/dir2/test.gif".to_string());
+
+        assert!(if let Formats::Gif = format { true } else { false });
     }
 
     #[test]
