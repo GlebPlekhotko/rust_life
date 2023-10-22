@@ -16,5 +16,10 @@ pub enum ErrorCode {
     NoFileExtension = -13,
     EmptyPath = -14,
     FailedToCreateDirectory = -15,
-    CellsNotExpected = -16
+    CellsNotExpected = -16,
+    NotSupported = -17,
+    UnrecognizedColor = -18,
+    CoordinatesToIndexConversionFailure = -19,
+    GifRepeatIntervalSetFailed = -20,
+    GifFrameWriteFailed = -21
 }

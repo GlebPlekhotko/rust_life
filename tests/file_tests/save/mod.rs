@@ -147,3 +147,55 @@ fn rle_file_nested_dirs() {
         panic!("Failed to remove a directory while testing");
     }
 }
+
+#[test]
+fn gif_file() {
+    let file_path = "tests/file_tests/test.gif".to_string();
+    let mut field : Vec<Vec<bool>> = Vec::new();
+
+    for row in 0..5 {
+        field.push(Vec::new());
+
+        for _cell in 0..4 {
+            field[row].push(false);
+        }
+    }
+    field[1][0] = true;
+    field[2][1] = true;
+    field[0][2] = true; field[1][2] = true; field[2][2] = true;
+        
+    let result = save(&mut field, &file_path);
+
+    if let Ok(_) = result { assert!(true) } else { assert!(false) };
+    assert!(std::path::Path::new(&file_path).exists());
+    if let Err(_) = std::fs::remove_file(&file_path) {
+        panic!("Failed to delete a file while testing");
+    }
+}
+
+#[test]
+fn gif_file_nested_dirs() {
+
+    let file_path = "tests/file_tests/nested/test.gif".to_string();
+    let dir_path = "tests/file_tests/nested/";
+    let mut field : Vec<Vec<bool>> = Vec::new();
+
+    for row in 0..5 {
+        field.push(Vec::new());
+
+        for _cell in 0..4 {
+            field[row].push(false);
+        }
+    }
+    field[1][0] = true;
+    field[2][1] = true;
+    field[0][2] = true; field[1][2] = true; field[2][2] = true;
+        
+    let result = save(&mut field, &file_path);
+
+    if let Ok(_) = result { assert!(true) } else { assert!(false) };
+    assert!(std::path::Path::new(&file_path).exists());
+    if let Err(_) = std::fs::remove_dir_all(&dir_path) {
+        panic!("Failed to remove a directory while testing");
+    }
+}

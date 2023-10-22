@@ -145,20 +145,32 @@ pub fn save(population : &Vec<Vec<bool>>, path : &String) -> Result<(), ErrorCod
         }
     }
 
-    match deduce(path) {
-        Formats::PlainText => plaintext::save(population, &mut content),
-        Formats::Rle => rle::save(population, &mut content),
-        _ => Err(ErrorCode::UnrecognizedFileFormat)
-    }?;
-
     let mut file = match File::create(path) {
         Ok(handle) => handle,
         _ => return Err(ErrorCode::FailedToCreateFile),
-    };    
+    };
 
-    if let Err(_) = file.write(content.as_bytes()) {
-        return Err(ErrorCode::FailedToWriteFile);
-    }
+    match deduce(path) {
+        Formats::PlainText => {
+            plaintext::save(population, &mut content)?;
+            if let Err(_) = file.write(content.as_bytes()) {
+                return Err(ErrorCode::FailedToWriteFile);
+            }
+        },
+        Formats::Rle => {
+            rle::save(population, &mut content)?;
+            if let Err(_) = file.write(content.as_bytes()) {
+                return Err(ErrorCode::FailedToWriteFile);
+            }
+        },
+        Formats::Gif => {
+            gif::save(&file, population)?;
+        },
+        _ => {
+            return Err(ErrorCode::UnrecognizedFileFormat);
+        }
+    };
+    
 
     Ok(())
 }
