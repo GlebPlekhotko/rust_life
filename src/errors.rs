@@ -21,5 +21,6 @@ pub enum ErrorCode {
     UnrecognizedColor = -18,
     CoordinatesToIndexConversionFailure = -19,
     GifRepeatIntervalSetFailed = -20,
-    GifFrameWriteFailed = -21
+    GifFrameWriteFailed = -21,
+    ZeroScale = -22
 }

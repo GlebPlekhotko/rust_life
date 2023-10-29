@@ -9,6 +9,46 @@ enum Color {
 	LAST
 }
 
+
+/// Takes given field of cells and moves it to the GIF's canvas
+
+fn populate_canvas(canvas : &mut Vec<u8>, field : &Vec<Vec<bool>>, scale : u16) -> Result<(), ErrorCode>
+{
+    let field_width = field.len();
+
+    if scale == 0 {
+        return Err(ErrorCode::ZeroScale);
+    }
+
+    let mut x = 0;
+    for row in field {
+        let mut y = 0;
+
+        for cell in row {
+            for x_offset in 0..scale {
+                for y_offset in 0..scale {
+                    let x_scaled = (x * scale + x_offset) as usize;
+                    let y_scaled = (y * scale + y_offset) as usize;
+
+                    let pixel = coordinates_to_index(x_scaled, y_scaled, field_width * scale as usize)?;
+
+                    if *cell == true {
+                        canvas[pixel] = Color::BLACK as u8;
+                    } else {
+                        canvas[pixel] = Color::WHITE as u8;
+                    }
+                }
+            }            
+
+            y += 1;
+        }
+
+        x += 1;
+    }
+
+    Ok(())
+}
+
 /// Returns the dimensions of the field in the plaintext encoded file
 
 pub fn dimensions(content : &String) -> Result<(usize, usize), ErrorCode>
@@ -18,9 +58,9 @@ pub fn dimensions(content : &String) -> Result<(usize, usize), ErrorCode>
 
 /// Takes (x, y) coordinates of the cell and translated them to the index
 
-fn coordinates_to_index(x : u16, y : u16, width : u16) -> Result<usize, ErrorCode> {
+fn coordinates_to_index(x : usize, y : usize, width : usize) -> Result<usize, ErrorCode> {
 	if x < width && width > 0 {
-        Ok((x + (y * width)) as usize)
+        Ok(x + y * width)
     } else {
         Err(ErrorCode::CoordinatesToIndexConversionFailure)
     }
@@ -176,6 +216,104 @@ mod tests {
             } else {
                 assert!(false);
             }
+        }
+    }
+
+    mod populate_canvas {
+        use super::*;
+
+        fn create_field_and_canvas(scale : u16) -> (Vec<Vec<bool>>, Vec<u8>, Vec<u8>) {
+            let mut field : Vec<Vec<bool>> = Vec::new();
+            for x in 0..4 {
+                field.push(Vec::new());
+                for _y in 0..3 {
+                    field[x].push(false);
+                }
+            }
+
+            let mut canvas: Vec<u8> = Vec::with_capacity(field.len() * field[0].len() * (scale * scale) as usize);
+            let mut expected_canvas: Vec<u8> = Vec::with_capacity(field.len() * field[0].len() * (scale * scale) as usize);
+            for _byte in 0..canvas.capacity() {
+                canvas.push(0);
+                expected_canvas.push(1);
+            }
+
+            (field, canvas, expected_canvas)
+        }
+
+        #[test]
+        fn scale_zero() {
+            let (field, mut canvas, expected) = create_field_and_canvas(1);
+
+            let result = populate_canvas(&mut canvas, &field, 0);
+        
+            if let Err(ErrorCode::ZeroScale) = result {
+                assert!(true);
+            }
+        }
+
+        #[test]
+        fn scale_one_empty_field() {
+            let (field, mut canvas, expected) = create_field_and_canvas(1);
+
+            let result = populate_canvas(&mut canvas, &field, 1);
+        
+            if let Ok(_) = result {
+                assert!(true);
+            }
+
+            assert_eq!(expected, canvas);
+        }
+
+        #[test]
+        fn scale_one_not_empty_field() {
+            let (mut field, mut canvas, mut expected) = create_field_and_canvas(1);
+            for y in 0..field[0].len() {
+                field[2][y] = true;
+                expected[coordinates_to_index(2, y, field.len()).unwrap()] = 0;
+            }
+
+            let result = populate_canvas(&mut canvas, &field, 1);
+        
+            if let Ok(_) = result {
+                assert!(true);
+            }
+            assert_eq!(expected, canvas);
+        }
+
+        #[test]
+        fn scale_two_empty_field() {
+            let (field, mut canvas, expected) = create_field_and_canvas(2);
+
+            let result = populate_canvas(&mut canvas, &field, 2);
+        
+            if let Ok(_) = result {
+                assert!(true);
+            }
+            assert_eq!(expected, canvas);
+        }
+
+        #[test]
+        fn scale_two_not_empty_field() {
+            let scale = 2;
+            let (mut field, mut canvas, mut expected) = create_field_and_canvas(scale);
+            for y in 0..field[0].len() {
+                field[2][y] = true;
+            }
+            for y in 0..field[0].len() * 2 {
+                let index = coordinates_to_index(4, y, field.len() * 2).unwrap();
+                expected[index] = 0;
+                
+                let index = coordinates_to_index(5, y, field.len() * 2).unwrap();
+                expected[index] = 0;
+            }
+
+            let result = populate_canvas(&mut canvas, &field, scale);
+        
+            if let Ok(_) = result {
+                assert!(true);
+            }
+            assert_eq!(expected, canvas);
         }
     }
 }
