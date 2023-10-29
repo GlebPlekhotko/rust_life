@@ -78,13 +78,12 @@ pub fn load(_field : &mut Vec<Vec<bool>>, _content : &String) -> Result<(), Erro
 
 pub fn save(file: &File, field : & Vec<Vec<bool>>) -> Result<(), ErrorCode>
 {
-	let width = field.len() as u16;
-    let height = field[0].len() as u16;
+	let mut width = field.len() as u16;
+    let mut height = field[0].len() as u16;
     let scale_width : u16 = 512 / width;
     let scale_height : u16 = 512 / height;
-    let mut scale = 1;
+    let scale : u16;
 
-    
     if scale_width == 0 || scale_height == 0 {
     	scale = 1;
     } else {
@@ -95,34 +94,21 @@ pub fn save(file: &File, field : & Vec<Vec<bool>>) -> Result<(), ErrorCode>
     	}
     }
 
-    let pixels_in_canvas = width * height * scale;
-	let mut canvas: Vec<u8> = Vec::with_capacity(pixels_in_canvas as usize);
+    if width as u32 * scale as u32 > u16::MAX as u32 ||
+       height as u32 * scale as u32 > u16::MAX as u32 {
+        return Err(ErrorCode::GifResolutionOverflow);
+    }
+
+    width *= scale;
+    height *= scale;
+
+    let pixels_in_canvas : usize = width as usize * height as usize;
+	let mut canvas: Vec<u8> = Vec::with_capacity(pixels_in_canvas);
 	for _byte in 0..canvas.capacity() {
 		canvas.push(0);
 	}
 
     populate_canvas(&mut canvas, field, scale)?;
-
-    /*
-	let mut x = 0;
-	for row in field {
-		let mut y = 0;
-
-		for cell in row {
-            let pixel = coordinates_to_index(x, y, width)?;
-
-			if *cell == true {
-				canvas[pixel] = Color::BLACK as u8;
-			} else {
-				canvas[pixel] = Color::WHITE as u8;
-			}
-
-			y += 1;
-		}
-
-		x += 1;
-	}
-    */
 
     let mut palette: Vec<u8> = Vec::with_capacity((Color::LAST as u32 * 3) as usize);
     for color in 0..Color::LAST as u8 {
@@ -148,8 +134,8 @@ pub fn save(file: &File, field : & Vec<Vec<bool>>) -> Result<(), ErrorCode>
         needs_user_input: false,
         top: 0,
         left: 0,
-        width: width * scale,
-        height: height * scale,
+        width: width,
+        height: height,
         interlaced: false,
         palette: None,
         buffer: Cow::from(&canvas)

@@ -22,5 +22,6 @@ pub enum ErrorCode {
     CoordinatesToIndexConversionFailure = -19,
     GifRepeatIntervalSetFailed = -20,
     GifFrameWriteFailed = -21,
-    ZeroScale = -22
+    ZeroScale = -22,
+    GifResolutionOverflow = -23
 }
