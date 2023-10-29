@@ -69,7 +69,7 @@ fn coordinates_to_index(x : usize, y : usize, width : usize) -> Result<usize, Er
 
 /// Loads (initializes) the field using the file's content
 
-pub fn load(field : &mut Vec<Vec<bool>>, content : &String) -> Result<(), ErrorCode>
+pub fn load(_field : &mut Vec<Vec<bool>>, _content : &String) -> Result<(), ErrorCode>
 {
     Err(ErrorCode::NotSupported)
 }
@@ -80,11 +80,11 @@ pub fn save(file: &File, field : & Vec<Vec<bool>>) -> Result<(), ErrorCode>
 {
 	let width = field.len() as u16;
     let height = field[0].len() as u16;
-    //let scale_width : u16 = 512 / width;
-    //let scale_height : u16 = 512 / height;
-    let scale = 1;
+    let scale_width : u16 = 512 / width;
+    let scale_height : u16 = 512 / height;
+    let mut scale = 1;
 
-    /*
+    
     if scale_width == 0 || scale_height == 0 {
     	scale = 1;
     } else {
@@ -94,14 +94,16 @@ pub fn save(file: &File, field : & Vec<Vec<bool>>) -> Result<(), ErrorCode>
     		scale = scale_height;
     	}
     }
-    */
 
     let pixels_in_canvas = width * height * scale;
 	let mut canvas: Vec<u8> = Vec::with_capacity(pixels_in_canvas as usize);
-	for byte in 0..canvas.capacity() {
+	for _byte in 0..canvas.capacity() {
 		canvas.push(0);
 	}
 
+    populate_canvas(&mut canvas, field, scale)?;
+
+    /*
 	let mut x = 0;
 	for row in field {
 		let mut y = 0;
@@ -120,6 +122,7 @@ pub fn save(file: &File, field : & Vec<Vec<bool>>) -> Result<(), ErrorCode>
 
 		x += 1;
 	}
+    */
 
     let mut palette: Vec<u8> = Vec::with_capacity((Color::LAST as u32 * 3) as usize);
     for color in 0..Color::LAST as u8 {
@@ -145,8 +148,8 @@ pub fn save(file: &File, field : & Vec<Vec<bool>>) -> Result<(), ErrorCode>
         needs_user_input: false,
         top: 0,
         left: 0,
-        width: width,
-        height: height,
+        width: width * scale,
+        height: height * scale,
         interlaced: false,
         palette: None,
         buffer: Cow::from(&canvas)
