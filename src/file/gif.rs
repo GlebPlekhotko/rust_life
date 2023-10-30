@@ -12,6 +12,13 @@ enum Color {
 
 /// Takes given field of cells and moves it to the GIF's canvas
 
+/**
+    This function also implements the scaling feature. The idea is that if I put one pixel per cell, that yields 
+    a very tiny bitmap, if the field is only 10 by 10 cells. It would be quite inconvenient to look at it. So a
+    scaling factor greater than one may be given to address this problem. It simply multiplies the field and its
+    content by the given integer value. So if the original field is only 10 by 10 cells and the scaling factor is 10,
+    then bitmap of the GIF will be 100 by 100 pixels, where each cell occupies a square region 10 by 10 pixels in size.
+*/
 fn populate_canvas(canvas : &mut Vec<u8>, field : &Vec<Vec<bool>>, scale : u16) -> Result<(), ErrorCode>
 {
     let field_width = field.len();
@@ -69,6 +76,8 @@ pub fn save(file: &File, field : & Vec<Vec<bool>>) -> Result<(), ErrorCode>
     let scale_height : u16 = 512 / height;
     let scale : u16;
 
+    /* In order to keep the resolution of the outcome GIF file at a reasonable few hundred pixels at least, here I
+       automatically assess the required scaling factor. That is applicable to the small fields only. */
     if scale_width == 0 || scale_height == 0 {
     	scale = 1;
     } else {

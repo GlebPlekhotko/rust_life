@@ -199,7 +199,8 @@ pub fn help() {
     println!("               .cells - text file format where each character denotes a cell;");
     println!("               .rle   - run length encoded file;");
     println!("  -o <name>  specifies the name of the ouput file, format is guessed by the");
-    println!("             extension, supported files are the same as for input;");
+    println!("             extension, supported files are the same as for input, plus the \".gif\"");
+    println!("             for the non-animated GIF output;");
 }
 
 /// Returns true if a given switch must be followed by a value
