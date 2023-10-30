@@ -49,13 +49,6 @@ fn populate_canvas(canvas : &mut Vec<u8>, field : &Vec<Vec<bool>>, scale : u16) 
     Ok(())
 }
 
-/// Returns the dimensions of the field in the plaintext encoded file
-
-pub fn dimensions(content : &String) -> Result<(usize, usize), ErrorCode>
-{
-    Err(ErrorCode::NotSupported)
-}
-
 /// Takes (x, y) coordinates of the cell and translated them to the index
 
 fn coordinates_to_index(x : usize, y : usize, width : usize) -> Result<usize, ErrorCode> {
@@ -66,15 +59,7 @@ fn coordinates_to_index(x : usize, y : usize, width : usize) -> Result<usize, Er
     }
 }
 
-
-/// Loads (initializes) the field using the file's content
-
-pub fn load(_field : &mut Vec<Vec<bool>>, _content : &String) -> Result<(), ErrorCode>
-{
-    Err(ErrorCode::NotSupported)
-}
-
-/// Saves content of the field to the gif file
+/// Saves content of the field to the GIF file
 
 pub fn save(file: &File, field : & Vec<Vec<bool>>) -> Result<(), ErrorCode>
 {
@@ -110,7 +95,7 @@ pub fn save(file: &File, field : & Vec<Vec<bool>>) -> Result<(), ErrorCode>
 
     populate_canvas(&mut canvas, field, scale)?;
 
-    let mut palette: Vec<u8> = Vec::with_capacity((Color::LAST as u32 * 3) as usize);
+    let mut palette: Vec<u8> = Vec::with_capacity(Color::LAST as usize * 3);
     for color in 0..Color::LAST as u8 {
         if color == Color::BLACK as u8 {
             palette.push(0x00);
@@ -232,7 +217,7 @@ mod tests {
 
         #[test]
         fn scale_zero() {
-            let (field, mut canvas, expected) = create_field_and_canvas(1);
+            let (field, mut canvas, _) = create_field_and_canvas(1);
 
             let result = populate_canvas(&mut canvas, &field, 0);
         

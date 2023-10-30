@@ -84,6 +84,7 @@ pub fn dimensions(path : &String) -> Result<(usize, usize), ErrorCode>
             match deduce(path) {
                 Formats::PlainText => plaintext::dimensions(&content),
                 Formats::Rle => rle::dimensions(&content),
+                Formats::Gif => return Err(ErrorCode::NotSupported),
                 _ => return Err(ErrorCode::UnrecognizedFileFormat)
             }
         },
@@ -118,19 +119,27 @@ pub fn load(population : &mut Vec<Vec<bool>>, path : &String) -> Result<(), Erro
     match File::open(&path) {
         Ok(mut file) => {
             let mut content = String::new();
-
-            if let Err(_) = file.read_to_string(&mut content) {
-                return Err(ErrorCode::FailedToReadFile)
-            }
         
             match deduce(path) {
-                Formats::PlainText => plaintext::load(population, &content),
-                Formats::Rle => rle::load(population, &content),
+                Formats::PlainText => {
+                    if let Err(_) = file.read_to_string(&mut content) {
+                        return Err(ErrorCode::FailedToReadFile)
+                    }
+                    plaintext::load(population, &content)?;
+                },
+                Formats::Rle => {
+                    if let Err(_) = file.read_to_string(&mut content) {
+                        return Err(ErrorCode::FailedToReadFile)
+                    }
+                    rle::load(population, &content)?;
+                },
                 _ => return Err(ErrorCode::UnrecognizedFileFormat)
             }
         },
-        Err(_) => Err(ErrorCode::FailedToOpenFile)
+        Err(_) => return Err(ErrorCode::FailedToOpenFile)
     }
+
+    Ok(())
 }
 
 /// Saves the given population to the destination file

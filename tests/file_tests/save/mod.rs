@@ -53,8 +53,8 @@ fn plaintext_file() {
 #[test]
 fn plaintext_file_nested_dirs() {
 
-    let file_path = "tests/file_tests/nested/test.cells".to_string();
-    let dir_path = "tests/file_tests/nested/";
+    let file_path = "tests/file_tests/nested_plaintext/test.cells".to_string();
+    let dir_path = "tests/file_tests/nested_plaintext/";
     let mut field : Vec<Vec<bool>> = Vec::new();
 
 
@@ -118,8 +118,8 @@ fn rle_file() {
 #[test]
 fn rle_file_nested_dirs() {
 
-    let file_path = "tests/file_tests/nested/test.rle".to_string();
-    let dir_path = "tests/file_tests/nested/";
+    let file_path = "tests/file_tests/nested_rle/test.rle".to_string();
+    let dir_path = "tests/file_tests/nested_rle/";
     let mut field : Vec<Vec<bool>> = Vec::new();
 
     for row in 0..5 {
@@ -176,8 +176,8 @@ fn gif_file() {
 #[test]
 fn gif_file_nested_dirs() {
 
-    let file_path = "tests/file_tests/nested/test.gif".to_string();
-    let dir_path = "tests/file_tests/nested/";
+    let file_path = "tests/file_tests/nested_gif/test.gif".to_string();
+    let dir_path =  "tests/file_tests/nested_gif/";
     let mut field : Vec<Vec<bool>> = Vec::new();
 
     for row in 0..5 {
