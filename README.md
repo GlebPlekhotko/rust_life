@@ -3,7 +3,7 @@ This is a very simple implementation of the Conway's Life cellular automaton. It
 
 At the beginning, I've been thinking about adding a GUI of some sort to display an animated field of cells. But it appeared to be too time-consuming for the educational project, plus there was no standard GUI for the Rust. So, wasting time for studying some peculiar implementations was really not worth it. In any case, I'm not going to use the Rust for some user-oriented programming. So I stuck to the two IO "devices": the console and files.
 
-The console is used for output only. There is no way to setup initial configuration using it. While the files may be used for both input and output. There are two formats supported: the [plaintext](https://conwaylife.com/wiki/Plaintext) and the [run length encoded](https://conwaylife.com/wiki/Run_Length_Encoded).
+The console is used for output only. There is no way to setup initial configuration using it. While the files may be used for both input and output. There are two formats supported: the [plaintext](https://conwaylife.com/wiki/Plaintext) and the [run length encoded](https://conwaylife.com/wiki/Run_Length_Encoded). For the output only, the venerable [GIF](https://en.wikipedia.org/wiki/GIF) format may be used as well. Though the current program does not utilize its animation features, it just writes a bunch of files to the disk, it is still much more perceivable than the text files mentioned earlier.
 
 A few words to say about the edge conditions. The behavior of the patterns found at the very edge of the field greatly depends on what is beyond the edge (I refer to it as "fence" in code). There are a few different approaches to address it and current implementation presents the following options:
 * cliff;
